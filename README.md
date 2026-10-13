@@ -7,6 +7,8 @@ the same ideas.
 DBMS Level 3 mini project, PES University (EC Campus), Dept. of CSE. Database option: **SQL + vector database**
 (PostgreSQL 17 + pgvector).
 
+**Team:** Darshan P Pawar (PES2UG24CS143) · Dhanush V Biradar (PES2UG24CS155)
+
 | Layer | Technology |
 | --- | --- |
 | Relational database | PostgreSQL 17 (Docker) — 12 tables, views, a materialized view, 14 triggers, 12 functions, 3 procedures |
@@ -137,7 +139,12 @@ docker exec -i scholarmesh-db psql -U postgres -d scholarmesh < db/10_important_
 - Known limitation: students enroll themselves, so "course-only" notes are visible to anyone who enrolls in
   that course. A production deployment would sync enrollments from the university system or use join codes.
 
-## Team and Git workflow
+## Team
 
-Two-member team. Please commit your own work from your own Git account so the history shows each
-member's contribution, e.g. one feature branch per area (`db/…`, `web/…`) merged through pull requests.
+| Member | SRN | Responsibilities |
+| --- | --- | --- |
+| Darshan P Pawar | PES2UG24CS143 | Notes & search: Phase 1 design and fixes, Phase 2 schema, pgvector, chunking, keyword/semantic/hybrid search, seed data, upload and search UI, report |
+| Dhanush V Biradar | PES2UG24CS155 | People, groups & admin: views, group triggers and procedures, recommendations, audit and grants, important queries, auth and API layer, group/admin pages, tests |
+
+Each member commits their own work from their own GitHub account so the history shows individual
+contributions (one feature branch per area, merged through pull requests).
