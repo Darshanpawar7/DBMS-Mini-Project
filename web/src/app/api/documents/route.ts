@@ -2,6 +2,7 @@ import { requireApiUser } from "@/lib/auth/current-user";
 import { assertCanUseCourse } from "@/lib/repos/courses";
 import { deleteUpload, detectFileType, extractText, MAX_UPLOAD_BYTES, saveUpload, type StoredFileType } from "@/lib/files";
 import { ApiError, ok, route } from "@/lib/http";
+import { rateLimit } from "@/lib/rate-limit";
 import { createDocument, listDocuments } from "@/lib/repos/documents";
 import { embedDocument, markEmbeddingFailed } from "@/lib/repos/embedding-jobs";
 import { documentListSchema, documentMetaSchema, splitTags } from "@/lib/validation";
@@ -35,9 +36,16 @@ async function readContent(form: FormData): Promise<{ bytes: Uint8Array; type: S
   throw new ApiError(400, "Attach a file or paste some text", { file: "Required" });
 }
 
+const HOUR = 60 * 60 * 1000;
+const MAX_BODY_BYTES = MAX_UPLOAD_BYTES + 512 * 1024; // file + form fields
+
 // POST /api/documents  (multipart/form-data: title, description, visibility, course_id, tags, file | text)
 export const POST = route(async (request) => {
   const user = await requireApiUser();
+  // refuse oversized bodies before buffering them
+  const declared = Number(request.headers.get("content-length") ?? 0);
+  if (declared > MAX_BODY_BYTES) throw new ApiError(413, "Uploads must be 5 MB or smaller", { file: "Too large" });
+  rateLimit(`upload:${user.student_id}`, 30, HOUR);
   const form = await request.formData();
   const meta = documentMetaSchema.parse({
     title: field(form, "title"),

@@ -5,6 +5,9 @@ import { ApiError } from "./errors";
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 const MIN_TEXT_CHARS = 40;
+// caps keep one upload from monopolising memory and the embedding model
+const MAX_PDF_PAGES = 150;
+export const MAX_TEXT_CHARS = 300_000; // ~375 passages of 800 characters
 
 export type StoredFileType = "pdf" | "txt" | "md";
 
@@ -31,6 +34,9 @@ export async function extractText(bytes: Uint8Array, type: StoredFileType): Prom
     }
     const { extractText: extractPdfText, getDocumentProxy } = await import("unpdf");
     const pdf = await getDocumentProxy(new Uint8Array(bytes));
+    if (pdf.numPages > MAX_PDF_PAGES) {
+      throw new ApiError(413, `PDFs may have at most ${MAX_PDF_PAGES} pages`, { file: "Too many pages" });
+    }
     const result = await extractPdfText(pdf, { mergePages: false });
     text = (result.text as string[]).join("\n\n");
   } else {
@@ -39,6 +45,9 @@ export async function extractText(bytes: Uint8Array, type: StoredFileType): Prom
   const cleaned = text.replace(/\u0000/g, "").replace(/\r\n?/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
   if (cleaned.length < MIN_TEXT_CHARS) {
     throw new ApiError(400, "No readable text found (scanned PDFs are not supported)", { file: "No text found" });
+  }
+  if (cleaned.length > MAX_TEXT_CHARS) {
+    throw new ApiError(413, `The text is too long (limit ${MAX_TEXT_CHARS.toLocaleString("en")} characters) — split it into smaller notes`, { file: "Too long" });
   }
   return cleaned;
 }
