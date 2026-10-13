@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="1200" height="620" font-family="Inter, Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="620" fill="white"/>
+
+  <!-- column 1: browser -->
+  <rect x="20" y="40" width="250" height="540" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="145" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#0f172a">Browser</text>
+  <text x="145" y="86" text-anchor="middle" font-size="11" fill="#64748b">student · admin</text>
+  <rect x="40" y="110" width="210" height="150" rx="10" fill="white" stroke="#c7d2fe"/>
+  <text x="145" y="134" text-anchor="middle" font-size="12.5" font-weight="700" fill="#312e81">React UI (Next.js 16)</text>
+  <text x="56" y="158" font-size="11" fill="#334155">• Server-rendered pages</text>
+  <text x="56" y="176" font-size="11" fill="#334155">• Client forms &amp; buttons</text>
+  <text x="56" y="194" font-size="11" fill="#334155">• Search UI, charts</text>
+  <text x="56" y="212" font-size="11" fill="#334155">• fetch('/api/…') JSON</text>
+  <text x="56" y="230" font-size="11" fill="#334155">• Tailwind CSS</text>
+  <rect x="40" y="290" width="210" height="96" rx="10" fill="white" stroke="#c7d2fe"/>
+  <text x="145" y="314" text-anchor="middle" font-size="12.5" font-weight="700" fill="#312e81">Session cookie</text>
+  <text x="56" y="338" font-size="11" fill="#334155">httpOnly · SameSite=Lax</text>
+  <text x="56" y="356" font-size="11" fill="#334155">HS256 JWT: user id + role</text>
+  <text x="56" y="374" font-size="11" fill="#334155">7-day expiry</text>
+
+  <!-- column 2: next.js server -->
+  <rect x="320" y="40" width="470" height="540" rx="14" fill="#eef2ff" stroke="#a5b4fc"/>
+  <text x="555" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#0f172a">Next.js server (Node.js)</text>
+  <text x="555" y="86" text-anchor="middle" font-size="11" fill="#64748b">backend / API layer · no database access from the browser</text>
+
+  <rect x="340" y="104" width="430" height="52" rx="9" fill="white" stroke="#a5b4fc"/>
+  <text x="555" y="126" text-anchor="middle" font-size="12.5" font-weight="700" fill="#312e81">proxy.ts — first gate (signed cookie present?)</text>
+  <text x="555" y="144" text-anchor="middle" font-size="11" fill="#334155">redirects anonymous users · role and active checks happen against the database</text>
+
+  <rect x="340" y="168" width="205" height="150" rx="9" fill="white" stroke="#a5b4fc"/>
+  <text x="442" y="190" text-anchor="middle" font-size="12.5" font-weight="700" fill="#312e81">Pages (RSC)</text>
+  <text x="354" y="212" font-size="11" fill="#334155">/dashboard /search</text>
+  <text x="354" y="229" font-size="11" fill="#334155">/documents /groups</text>
+  <text x="354" y="246" font-size="11" fill="#334155">/courses /admin/*</text>
+  <text x="354" y="268" font-size="11" fill="#334155">requireUser() re-reads</text>
+  <text x="354" y="285" font-size="11" fill="#334155">role + is_active from DB</text>
+
+  <rect x="565" y="168" width="205" height="150" rx="9" fill="white" stroke="#a5b4fc"/>
+  <text x="667" y="190" text-anchor="middle" font-size="12.5" font-weight="700" fill="#312e81">Route handlers /api</text>
+  <text x="579" y="212" font-size="11" fill="#334155">22 REST routes</text>
+  <text x="579" y="229" font-size="11" fill="#334155">zod validation</text>
+  <text x="579" y="246" font-size="11" fill="#334155">same-origin (CSRF) check</text>
+  <text x="579" y="263" font-size="11" fill="#334155">login rate limit</text>
+  <text x="579" y="280" font-size="11" fill="#334155">pg errors → HTTP codes</text>
+  <text x="579" y="297" font-size="11" fill="#334155">{ ok, data | error }</text>
+
+  <rect x="340" y="332" width="430" height="92" rx="9" fill="white" stroke="#a5b4fc"/>
+  <text x="555" y="354" text-anchor="middle" font-size="12.5" font-weight="700" fill="#312e81">Data access layer — lib/repos/*.ts</text>
+  <text x="354" y="376" font-size="11" fill="#334155">parameterised SQL only ($1, $2 …) · pg connection pool · withTransaction()</text>
+  <text x="354" y="394" font-size="11" fill="#334155">BEGIN … COMMIT/ROLLBACK · set_config('app.current_user_id') for the audit trigger</text>
+  <text x="354" y="412" font-size="11" fill="#334155">calls views, stored functions and CALL procedures</text>
+
+  <rect x="340" y="438" width="205" height="122" rx="9" fill="white" stroke="#a5b4fc"/>
+  <text x="442" y="460" text-anchor="middle" font-size="12.5" font-weight="700" fill="#312e81">Embedding model</text>
+  <text x="354" y="482" font-size="11" fill="#334155">all-MiniLM-L6-v2 (ONNX)</text>
+  <text x="354" y="499" font-size="11" fill="#334155">Transformers.js, local CPU</text>
+  <text x="354" y="516" font-size="11" fill="#334155">text → 384-d unit vector</text>
+  <text x="354" y="533" font-size="11" fill="#334155">no API key, no data leaves</text>
+
+  <rect x="565" y="438" width="205" height="122" rx="9" fill="white" stroke="#a5b4fc"/>
+  <text x="667" y="460" text-anchor="middle" font-size="12.5" font-weight="700" fill="#312e81">File storage</text>
+  <text x="579" y="482" font-size="11" fill="#334155">storage/uploads/&lt;uuid&gt;.pdf</text>
+  <text x="579" y="499" font-size="11" fill="#334155">PDF text via unpdf</text>
+  <text x="579" y="516" font-size="11" fill="#334155">client file names never</text>
+  <text x="579" y="533" font-size="11" fill="#334155">touch the file system</text>
+
+  <!-- column 3: postgres -->
+  <rect x="840" y="40" width="340" height="540" rx="14" fill="#ecfdf5" stroke="#6ee7b7"/>
+  <text x="1010" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#0f172a">PostgreSQL 17 + pgvector</text>
+  <text x="1010" y="86" text-anchor="middle" font-size="11" fill="#64748b">Docker · login: scholarmesh_app (least privilege)</text>
+
+  <rect x="860" y="104" width="300" height="104" rx="9" fill="white" stroke="#6ee7b7"/>
+  <text x="1010" y="126" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065f46">Relational data (SQL)</text>
+  <text x="874" y="148" font-size="11" fill="#334155">12 tables · PK / FK / UNIQUE / CHECK</text>
+  <text x="874" y="165" font-size="11" fill="#334155">STUDENT COURSE DOCUMENT TAG …</text>
+  <text x="874" y="182" font-size="11" fill="#334155">B-tree, composite, partial, expression</text>
+  <text x="874" y="199" font-size="11" fill="#334155">indexes</text>
+
+  <rect x="860" y="220" width="300" height="88" rx="9" fill="white" stroke="#6ee7b7"/>
+  <text x="1010" y="242" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065f46">Vector store (pgvector)</text>
+  <text x="874" y="264" font-size="11" fill="#334155">DOC_CHUNK.embedding vector(384)</text>
+  <text x="874" y="281" font-size="11" fill="#334155">HNSW index, cosine distance &lt;=&gt;</text>
+  <text x="874" y="298" font-size="11" fill="#334155">SEARCH_LOG.query_embedding</text>
+
+  <rect x="860" y="320" width="300" height="70" rx="9" fill="white" stroke="#6ee7b7"/>
+  <text x="1010" y="342" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065f46">Full-text search</text>
+  <text x="874" y="364" font-size="11" fill="#334155">generated tsvector + GIN index</text>
+  <text x="874" y="381" font-size="11" fill="#334155">websearch_to_tsquery · ts_rank_cd</text>
+
+  <rect x="860" y="402" width="300" height="158" rx="9" fill="white" stroke="#6ee7b7"/>
+  <text x="1010" y="424" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065f46">Logic inside the database</text>
+  <text x="874" y="446" font-size="11" fill="#334155">14 triggers: chunking, seat limit,</text>
+  <text x="874" y="463" font-size="11" fill="#334155">enrollment rule, admin hand-over, audit</text>
+  <text x="874" y="480" font-size="11" fill="#334155">functions: access control, 3 search</text>
+  <text x="874" y="497" font-size="11" fill="#334155">modes, group/partner matching</text>
+  <text x="874" y="514" font-size="11" fill="#334155">procedures: join / leave group, merge tags</text>
+  <text x="874" y="531" font-size="11" fill="#334155">views + materialized view</text>
+  <text x="874" y="548" font-size="11" fill="#334155">AUDIT_LOG (append-only for the app)</text>
+
+  <!-- arrows -->
+  <line x1="250" y1="185" x2="338" y2="185" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="294" y="176" text-anchor="middle" font-size="10" fill="#475569">HTTPS</text>
+  <path d="M250,240 H300 V162 H667 V166" fill="none" stroke="#475569" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#arrow)"/>
+  <text x="275" y="234" text-anchor="middle" font-size="10" fill="#475569">JSON</text>
+  <line x1="442" y1="318" x2="442" y2="330" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="667" y1="318" x2="667" y2="330" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="442" y1="424" x2="442" y2="436" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="667" y1="424" x2="667" y2="436" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="770" y1="378" x2="858" y2="300" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="812" y="330" text-anchor="middle" font-size="10" fill="#475569" transform="rotate(-41 812 330)">SQL over TCP 5433</text>
+</svg>
