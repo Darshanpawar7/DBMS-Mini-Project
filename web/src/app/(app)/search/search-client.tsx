@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { apiFetch } from "@/components/api-client";
 import { Alert, Badge, EmptyState, Highlighted, Meter, TagList, VisibilityBadge, buttonClass, cx, inlineInputClass, inputClass } from "@/components/ui";
 import type { SearchResponse } from "@/lib/repos/search";
@@ -36,6 +36,7 @@ export function SearchClient({ courses, tags, initialQuery, initialResponse }: P
   const [response, setResponse] = useState<SearchResponse | null>(initialResponse);
   const [error, setError] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+  const latestRequest = useRef(0);
 
   async function run(next: Query) {
     if (next.q.trim().length < 2) {
@@ -46,7 +47,9 @@ export function SearchClient({ courses, tags, initialQuery, initialResponse }: P
     setIsBusy(true);
     setError(null);
     const params = toParams(next);
+    const requestId = ++latestRequest.current;
     const result = await apiFetch<SearchResponse>(`/api/search?${params}`);
+    if (requestId !== latestRequest.current) return; // a newer search was started meanwhile
     setIsBusy(false);
     if (!result.ok) {
       setError(result.error.message);

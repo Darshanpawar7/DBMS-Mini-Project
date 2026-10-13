@@ -28,6 +28,8 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
         description="Hybrid search blends exact keyword matches (PostgreSQL full-text) with meaning matches (pgvector cosine similarity). Only notes you are allowed to see are ever returned."
       />
       <SearchClient
+        // a new URL (e.g. clicking "Search" in the nav) starts a fresh search state
+        key={JSON.stringify(params)}
         courses={courses.map((c) => ({ id: c.course_id, label: `${c.course_code} · ${c.course_title}` }))}
         tags={tags.map((t) => t.tag_name)}
         initialQuery={{
