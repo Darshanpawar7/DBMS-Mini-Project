@@ -34,6 +34,17 @@ describe("document triggers", () => {
     });
   });
 
+  test("bookkeeping updates (embedding status) do not change 'last edited'", async () => {
+    await inRolledBackTx(async (c) => {
+      const id = await docId(c, "dns-resolution");
+      const before = await scalar<string>(c, "SELECT updated_at::TEXT FROM DOCUMENT WHERE doc_id = $1", [id]);
+      await c.query("UPDATE DOCUMENT SET embedding_status = 'ready' WHERE doc_id = $1", [id]);
+      expect(await scalar(c, "SELECT updated_at::TEXT FROM DOCUMENT WHERE doc_id = $1", [id])).toBe(before);
+      await c.query("UPDATE DOCUMENT SET description = 'Edited' WHERE doc_id = $1", [id]);
+      expect(await scalar(c, "SELECT updated_at::TEXT FROM DOCUMENT WHERE doc_id = $1", [id])).not.toBe(before);
+    });
+  });
+
   test("deleting a course turns its course-only notes private instead of failing", async () => {
     await inRolledBackTx(async (c) => {
       const id = await docId(c, "routing-algorithms"); // course-only, Computer Networks

@@ -35,7 +35,8 @@ CREATE TRIGGER trg_tag_normalize
 
 -- ------------------------------------------------------------
 -- T3. DOCUMENT housekeeping (BEFORE INSERT/UPDATE)
---   * keep updated_at current (unless the UPDATE sets it explicitly)
+--   * stamp updated_at when the note itself is edited (not for
+--     bookkeeping such as embedding_status), unless set explicitly
 --   * a document whose course is deleted (FK SET NULL) drops from
 --     'course' to 'private' visibility instead of violating the CHECK
 --   * new or changed text means the embeddings are stale -> 'pending'
@@ -44,8 +45,9 @@ CREATE OR REPLACE FUNCTION fn_document_before_write() RETURNS TRIGGER
 LANGUAGE plpgsql AS $$
 BEGIN
     IF TG_OP = 'UPDATE' THEN
-        -- stamp the edit time unless the statement sets updated_at itself
-        IF NEW.updated_at IS NOT DISTINCT FROM OLD.updated_at THEN
+        IF NEW.updated_at IS NOT DISTINCT FROM OLD.updated_at
+           AND (NEW.title, NEW.description, NEW.visibility, NEW.course_id, NEW.content)
+               IS DISTINCT FROM (OLD.title, OLD.description, OLD.visibility, OLD.course_id, OLD.content) THEN
             NEW.updated_at := CURRENT_TIMESTAMP;
         END IF;
         IF NEW.course_id IS NULL AND OLD.course_id IS NOT NULL AND NEW.visibility = 'course' THEN
