@@ -9,7 +9,9 @@ const HOUR = 60 * 60 * 1000;
 
 // Self-registration always creates a 'student'; only an admin can grant 'admin'.
 export const POST = route(async (request) => {
-  rateLimit(`register:${clientIp(request)}`, 10, HOUR);
+  // per address behind a trusted proxy; otherwise one shared budget for the whole server
+  const ip = clientIp(request);
+  rateLimit(`register:${ip ?? "all"}`, ip ? 10 : 100, HOUR);
   const input = registerSchema.parse(await readJson(request));
   const user = await createStudent({
     full_name: input.full_name,

@@ -12,7 +12,10 @@ const DUMMY_HASH = "$2b$10$hJlRbSMDhFbjDD1F.xG12OitDhdV/yIW5b8R.Lr0XSILj9rqHjlpe
 
 export const POST = route(async (request) => {
   const input = loginSchema.parse(await readJson(request));
-  rateLimit(`login:${clientIp(request)}:${input.email}`, 8, FIFTEEN_MINUTES);
+  // per account (cannot be dodged by changing headers) and, behind a trusted proxy, per address
+  rateLimit(`login:${input.email}`, 10, FIFTEEN_MINUTES);
+  const ip = clientIp(request);
+  if (ip) rateLimit(`login-ip:${ip}`, 30, FIFTEEN_MINUTES);
 
   const student = await findStudentForLogin(input.email);
   const passwordOk = await verifyPassword(input.password, student?.password_hash ?? DUMMY_HASH);
