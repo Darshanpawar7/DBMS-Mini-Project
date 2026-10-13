@@ -9,7 +9,7 @@ DBMS Level 3 mini project, PES University (EC Campus), Dept. of CSE. Database op
 
 | Layer | Technology |
 | --- | --- |
-| Relational database | PostgreSQL 17 (Docker) — 12 tables, views, a materialized view, 14 triggers, 12 functions, 2 procedures |
+| Relational database | PostgreSQL 17 (Docker) — 12 tables, views, a materialized view, 14 triggers, 12 functions, 3 procedures |
 | Vector database | pgvector — 384-d embeddings, HNSW index, cosine distance |
 | Full-text search | generated `tsvector` column + GIN index |
 | Embeddings | `all-MiniLM-L6-v2` run locally with Transformers.js (no API key) |
