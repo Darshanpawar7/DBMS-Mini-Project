@@ -131,7 +131,11 @@ docker exec -i scholarmesh-db psql -U postgres -d scholarmesh < db/10_important_
   objects, and can only append to `AUDIT_LOG`.
 - Every query is parameterised; inputs are validated with zod in the API **and** by CHECK constraints in the database.
 - Passwords are bcrypt-hashed (a CHECK constraint rejects anything that is not a bcrypt hash).
-- httpOnly + SameSite cookies, same-origin check on every mutation, login rate limiting, security headers.
+- httpOnly + SameSite cookies, same-origin check on every mutation, per-account login rate limiting
+  (per-IP too when `TRUST_PROXY=true` behind a reverse proxy), upload size/page/rate limits, security headers.
+- PostgreSQL is published on `127.0.0.1` only.
+- Known limitation: students enroll themselves, so "course-only" notes are visible to anyone who enrolls in
+  that course. A production deployment would sync enrollments from the university system or use join codes.
 
 ## Team and Git workflow
 
