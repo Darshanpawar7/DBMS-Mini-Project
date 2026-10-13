@@ -1,6 +1,6 @@
 import { requireApiUser } from "@/lib/auth/current-user";
 import { ApiError, ok, parseId, readJson, route } from "@/lib/http";
-import { assertGroupManager, deleteGroup, getGroup, listMembers, updateGroup } from "@/lib/repos/groups";
+import { assertGroupManager, canViewGroup, deleteGroup, getGroup, listMembers, updateGroup } from "@/lib/repos/groups";
 import { groupUpdateSchema } from "@/lib/validation";
 
 type Ctx = RouteContext<"/api/groups/[id]">;
@@ -9,7 +9,7 @@ export const GET = route(async (_request, ctx: Ctx) => {
   const user = await requireApiUser();
   const groupId = parseId((await ctx.params).id);
   const group = await getGroup(groupId, user.student_id);
-  if (!group) throw new ApiError(404, "Group not found");
+  if (!group || !canViewGroup(group, user.role === "admin")) throw new ApiError(404, "Group not found");
   return ok({ group, members: await listMembers(groupId) });
 });
 

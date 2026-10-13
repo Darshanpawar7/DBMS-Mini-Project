@@ -37,6 +37,11 @@ export function getGroup(groupId: number, viewerId: number): Promise<GroupDetail
   );
 }
 
+/** Members, students enrolled in the group's course, and platform admins may open a group. */
+export function canViewGroup(group: GroupDetail, isPlatformAdmin: boolean): boolean {
+  return isPlatformAdmin || group.my_role !== null || group.is_enrolled;
+}
+
 export function listMembers(groupId: number): Promise<GroupMemberRow[]> {
   return query<GroupMemberRow>(
     `SELECT s.student_id, s.full_name, s.program, m.role, m.joined_at

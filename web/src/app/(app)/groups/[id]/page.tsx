@@ -6,7 +6,7 @@ import { DocumentCard } from "@/components/document-card";
 import { Alert, Avatar, Badge, Card, EmptyState, PageHeader, SectionTitle } from "@/components/ui";
 import { requireUser } from "@/lib/auth/current-user";
 import { formatDate } from "@/lib/format";
-import { getGroup, groupLibrary, listMembers } from "@/lib/repos/groups";
+import { canViewGroup, getGroup, groupLibrary, listMembers } from "@/lib/repos/groups";
 import { GroupForm } from "../group-form";
 
 export const metadata: Metadata = { title: "Study group" };
@@ -17,7 +17,7 @@ export default async function GroupPage({ params }: PageProps<"/groups/[id]">) {
   if (!Number.isInteger(groupId) || groupId <= 0) notFound();
 
   const group = await getGroup(groupId, user.student_id);
-  if (!group) notFound();
+  if (!group || !canViewGroup(group, user.role === "admin")) notFound(); // same answer as "does not exist"
   const [members, library] = await Promise.all([listMembers(groupId), groupLibrary(groupId, user.student_id)]);
   const canManage = group.my_role === "admin" || user.role === "admin";
 
