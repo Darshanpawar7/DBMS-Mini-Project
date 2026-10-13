@@ -1,0 +1,362 @@
+Pager usage is off.
+Border style is 2.
+
+=== Q1  JOIN (4 tables) + ORDER BY: the 5 most-saved public notes with owner and course
++--------------------------------------------+----------------+-------------+-------+
+|                   title                    |     owner      | course_code | saves |
++--------------------------------------------+----------------+-------------+-------+
+| Transformers and Self-Attention Explained  | Sneha Kulkarni | UE23CS353A  |     6 |
+| Dynamic Programming Patterns               | Ananya Rao     | UE23CS343A  |     5 |
+| Bias-Variance Trade-off and Regularization | Meera Pillai   | UE23CS352A  |     4 |
+| Normalization from 1NF to BCNF             | Ananya Rao     | UE23CS351A  |     4 |
+| CPU Scheduling Algorithms Compared         | Vikram Reddy   | UE23CS342A  |     3 |
++--------------------------------------------+----------------+-------------+-------+
+(5 rows)
+
+
+=== Q2  GROUP BY + HAVING + aggregates: courses with at least 3 notes
++-------------+-------+-----------+--------------+-------------+
+| course_code | notes | avg_bytes | first_upload | last_upload |
++-------------+-------+-----------+--------------+-------------+
+| UE23CS351A  |     6 |      1643 | 2026-09-02   | 2026-10-04  |
+| UE23CS352A  |     6 |      1550 | 2026-09-03   | 2026-10-07  |
+| UE23CS353A  |     5 |      1521 | 2026-09-12   | 2026-10-09  |
+| UE23CS342A  |     4 |      1614 | 2026-09-07   | 2026-10-02  |
+| UE23CS343A  |     4 |      1488 | 2026-09-09   | 2026-10-06  |
+| UE23CS341A  |     4 |      1670 | 2026-09-06   | 2026-10-05  |
+| UE23MA241B  |     3 |      1404 | 2026-09-11   | 2026-10-03  |
++-------------+-------+-----------+--------------+-------------+
+(7 rows)
+
+
+=== Q3  Subquery (IN): students who have bookmarked a note from a course they are NOT enrolled in
++-----------+
+| full_name |
++-----------+
++-----------+
+(0 rows)
+
+
+=== Q4  Correlated subquery (NOT EXISTS): enrolled students who belong to no study group of that course
++-------------+------------------------+
+| course_code | students_without_group |
++-------------+------------------------+
+| UE23MA241B  |                      7 |
+| UE23CS344A  |                      6 |
+| UE23CS343A  |                      5 |
+| UE23CS352A  |                      5 |
+| UE23CS342A  |                      4 |
+| UE23CS353A  |                      4 |
+| UE23CS341A  |                      3 |
+| UE23CS351A  |                      1 |
++-------------+------------------------+
+(8 rows)
+
+
+=== Q5  Scalar subquery in SELECT + CTE: each student vs the class average upload count
++--------------+-------+-----------+
+|  full_name   | notes | class_avg |
++--------------+-------+-----------+
+| Ananya Rao   |     4 |      2.06 |
+| Karthik Iyer |     3 |      2.06 |
+| Arjun Mehta  |     3 |      2.06 |
++--------------+-------+-----------+
+(3 rows)
+
+
+=== Q6  Window functions: rank notes inside each course by saves (RANK, PARTITION BY)
++-------------+-----------------------------------------------------+-------+-------------+
+| course_code |                        title                        | saves | course_rank |
++-------------+-----------------------------------------------------+-------+-------------+
+| UE23CS353A  | Transformers and Self-Attention Explained           |     6 |           1 |
+| UE23CS343A  | Dynamic Programming Patterns                        |     5 |           1 |
+| UE23CS351A  | Normalization from 1NF to BCNF                      |     4 |           1 |
+| UE23CS352A  | Bias-Variance Trade-off and Regularization          |     4 |           1 |
+| UE23CS341A  | TCP vs UDP and Congestion Control                   |     3 |           1 |
+| UE23CS342A  | CPU Scheduling Algorithms Compared                  |     3 |           1 |
+| UE23CS342A  | Virtual Memory, Paging and Page Replacement         |     3 |           1 |
+| UE23MA241B  | Eigenvalues and Eigenvectors, Intuitively           |     3 |           1 |
+| UE23CS344A  | Software Requirements: Functional vs Non-functional |     0 |           1 |
++-------------+-----------------------------------------------------+-------+-------------+
+(9 rows)
+
+
+=== Q7  Window function: running total of searches per day (SUM OVER)
++------------+----------+---------------+
+|    day     | searches | running_total |
++------------+----------+---------------+
+| 2026-10-13 |        6 |            56 |
+| 2026-10-12 |        2 |            50 |
+| 2026-10-11 |        3 |            48 |
+| 2026-10-10 |        3 |            45 |
+| 2026-10-09 |        2 |            42 |
+| 2026-10-08 |        2 |            40 |
+| 2026-10-07 |        3 |            38 |
++------------+----------+---------------+
+(7 rows)
+
+
+=== Q8  Views: catalog view + group overview view
++--------------------------------------------+----------------+-------------+---------------------------------------------------+----------------+-------------+
+|                   title                    |   owner_name   | course_code |                       tags                        | bookmark_count | chunk_count |
++--------------------------------------------+----------------+-------------+---------------------------------------------------+----------------+-------------+
+| Transformers and Self-Attention Explained  | Sneha Kulkarni | UE23CS353A  | {attention,neural-networks,nlp,transformers}      |              6 |           3 |
+| Dynamic Programming Patterns               | Ananya Rao     | UE23CS343A  | {dynamic-programming,exam-prep}                   |              5 |           3 |
+| Bias-Variance Trade-off and Regularization | Meera Pillai   | UE23CS352A  | {exam-prep,overfitting,regularization}            |              4 |           3 |
+| Normalization from 1NF to BCNF             | Ananya Rao     | UE23CS351A  | {exam-prep,functional-dependencies,normalization} |              4 |           3 |
+| Transactions, ACID and Isolation Levels    | Rahul Verma    | UE23CS351A  | {concurrency,exam-prep,transactions}              |              3 |           3 |
++--------------------------------------------+----------------+-------------+---------------------------------------------------+----------------+-------------+
+(5 rows)
+
++--------------------------+-------------+--------------+-------------+------------+
+|        group_name        | course_code | member_count | max_members | seats_left |
++--------------------------+-------------+--------------+-------------+------------+
+| Query Optimizers         | UE23CS351A  |            4 |           4 |          0 |
+| Normal Form Ninjas       | UE23CS351A  |            5 |           6 |          1 |
+| Kernel Trick Club        | UE23CS352A  |            3 |           5 |          2 |
+| Kernel Panic             | UE23CS342A  |            3 |           5 |          2 |
+| Packet Pushers           | UE23CS341A  |            4 |           6 |          2 |
+| DP on Trees              | UE23CS343A  |            4 |           6 |          2 |
+| Gradient Descenders      | UE23CS352A  |            3 |           6 |          3 |
+| Attention Is All We Need | UE23CS353A  |            4 |           8 |          4 |
++--------------------------+-------------+--------------+-------------+------------+
+(8 rows)
+
+
+=== Q9  Materialized view (refresh through the SECURITY DEFINER function)
++-------------------------------+
+|         refreshed_at          |
++-------------------------------+
+| 2026-10-13 08:43:51.873696+00 |
++-------------------------------+
+(1 row)
+
++-------------+-------------------+-----------+-----------+--------------+---------------+
+| course_code | enrolled_students | documents | bookmarks | study_groups | group_members |
++-------------+-------------------+-----------+-----------+--------------+---------------+
+| UE23CS352A  |                11 |         6 |        12 |            2 |             6 |
+| UE23CS351A  |                10 |         6 |        12 |            2 |             9 |
+| UE23CS353A  |                 8 |         5 |        13 |            1 |             4 |
+| UE23CS341A  |                 7 |         4 |         5 |            1 |             4 |
+| UE23CS342A  |                 7 |         4 |         6 |            1 |             3 |
+| UE23CS343A  |                 9 |         4 |         8 |            1 |             4 |
+| UE23MA241B  |                 7 |         3 |         5 |            0 |             0 |
+| UE23CS344A  |                 6 |         1 |         0 |            0 |             0 |
++-------------+-------------------+-----------+-----------+--------------+---------------+
+(8 rows)
+
+
+=== Q10 Full-text search: GIN index, websearch syntax, ranking and highlighted snippet
++-------------------------------------------------------+-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                         title                         | rank  |                                                                                                                              snippet                                                                                                                              |
++-------------------------------------------------------+-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Concurrency Control: Two-Phase Locking and Deadlocks  | 0.667 | abort, which prevents cascading rollbacks because nobody reads uncommitted data.                                                                                                                                                                                 +|
+|                                                       |       |                                                                                                                                                                                                                                                                  +|
+|                                                       |       | 2PL has a price: ⟦deadlock⟧. Example: T1 holds X on account A and requests B, while T2 holds … waiting for a lock held by T2. A cycle in the graph means ⟦deadlock⟧. The system then aborts a victim, usually the cheapest transaction to undo, and rolls it back |
+| Virtual Memory, Paging and Page Replacement           | 0.375 | valid bit; if the ⟦page⟧ is not in memory, the access causes a ⟦page⟧ ⟦fault⟧. The OS finds the ⟦page⟧ on disk, picks a free frame, loads it, updates                                                                                                             |
+| Semaphores, Mutexes and the Producer-Consumer Problem | 0.167 | then cannot get the mutex to remove an item, so neither can ever proceed: ⟦deadlock⟧. The rule is to wait on the counting semaphore first, then take the mutex                                                                                                    |
++-------------------------------------------------------+-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+(3 rows)
+
+
+=== Q11 Vector similarity search: nearest passages to a logged question (cosine distance <=>)
++-------------------------------------------+------------+------------------------------------------------------------------------+
+|                   title                   | similarity |                              best_passage                              |
++-------------------------------------------+------------+------------------------------------------------------------------------+
+| Word Embeddings: word2vec and GloVe       |      0.453 | The idea comes from the distributional hypothesis: you shall know a wo |
+| Transformers and Self-Attention Explained |      0.435 | Take "the animal did not cross the street because it was tired". The q |
+| ER Modelling and Mapping to Relations     |      0.335 | An ER (entity-relationship) model is a diagram of the data drawn befor |
++-------------------------------------------+------------+------------------------------------------------------------------------+
+(3 rows)
+
+
+=== Q12 Hybrid search: Reciprocal Rank Fusion of the two rankings
++-------------------------------------------+--------------+---------------+-----------+
+|                   title                   | keyword_rank | semantic_rank | rrf_score |
++-------------------------------------------+--------------+---------------+-----------+
+| RNNs, LSTMs and the Vanishing Gradient    |            1 |             1 |    0.0328 |
+| Linear Regression and Gradient Descent    |            2 |             3 |    0.0320 |
+| Backpropagation Without the Mystery       |            3 |             2 |    0.0320 |
+| Transformers and Self-Attention Explained |            4 |             4 |    0.0313 |
+| Convolutional Neural Networks Basics      |              |             5 |    0.0154 |
++-------------------------------------------+--------------+---------------+-----------+
+(5 rows)
+
+
+=== Q13 Study-group matching and study partners for Ananya
++--------------------------+-------------+------------+------------+-----------------------------------------------------------------------------------------------+-------------+
+|        group_name        | course_code | seats_left | similarity |                                          shared_tags                                          | match_score |
++--------------------------+-------------+------------+------------+-----------------------------------------------------------------------------------------------+-------------+
+| Attention Is All We Need | UE23CS353A  |          4 |      0.776 | {attention,backpropagation,gradient-descent,neural-networks,nlp,transformers,word-embeddings} |       0.753 |
+| Gradient Descenders      | UE23CS352A  |          3 |      0.752 | {classification,decision-trees,ensemble-learning,exam-prep,overfitting,regularization}        |       0.690 |
+| Kernel Trick Club        | UE23CS352A  |          2 |      0.669 | {classification,decision-trees,ensemble-learning}                                             |       0.568 |
++--------------------------+-------------+------------+------------+-----------------------------------------------------------------------------------------------+-------------+
+(3 rows)
+
++----------------+----------------------------------------------------------+------------+
+|   full_name    |                      shared_courses                      | similarity |
++----------------+----------------------------------------------------------+------------+
+| Meera Pillai   | {UE23CS343A,UE23CS351A,UE23CS352A,UE23CS353A,UE23MA241B} |      0.717 |
+| Siddharth Rao  | {UE23CS343A,UE23CS352A,UE23CS353A}                       |      0.713 |
+| Ishita Das     | {UE23CS351A,UE23CS352A,UE23CS353A}                       |      0.677 |
+| Sneha Kulkarni | {UE23CS352A,UE23CS353A,UE23MA241B}                       |      0.673 |
+| Priya Nair     | {UE23CS351A,UE23CS352A,UE23CS353A,UE23MA241B}            |      0.634 |
++----------------+----------------------------------------------------------+------------+
+(5 rows)
+
+
+=== Q14 DML inside a transaction: INSERT, UPDATE, DELETE, INSERT ... SELECT, then ROLLBACK
+BEGIN
++--------+---------------------+
+| tag_id |      tag_name       |
++--------+---------------------+
+|     72 | write-ahead-logging |
++--------+---------------------+
+(1 row)
+
+INSERT 0 1
++---------------------------------------+------------+
+|                 title                 | visibility |
++---------------------------------------+------------+
+| ER Modelling and Mapping to Relations | public     |
++---------------------------------------+------------+
+(1 row)
+
+UPDATE 1
++--------+--------+
+| doc_id | tag_id |
++--------+--------+
+|      5 |     72 |
++--------+--------+
+(1 row)
+
+INSERT 0 1
++--------+
+| doc_id |
++--------+
+|     10 |
+|     23 |
+|     18 |
+|      5 |
+|     11 |
+|     20 |
++--------+
+(6 rows)
+
+DELETE 6
++----------------------------+
+| ananya_bookmarks_inside_tx |
++----------------------------+
+|                          0 |
++----------------------------+
+(1 row)
+
+ROLLBACK
++---------------------------------+
+| ananya_bookmarks_after_rollback |
++---------------------------------+
+|                               6 |
++---------------------------------+
+(1 row)
+
+
+=== Q15 Stored procedure + triggers: a valid join succeeds, joining a full group fails (SM001)
+BEGIN
+CALL
++---------------------+--------------+------------+
+|     group_name      | member_count | seats_left |
++---------------------+--------------+------------+
+| Gradient Descenders |            4 |          2 |
++---------------------+--------------+------------+
+(1 row)
+
+SAVEPOINT
+ERROR:  This study group is full (4 of 4 seats taken)
+CONTEXT:  PL/pgSQL function fn_membership_check() line 13 at RAISE
+SQL statement "INSERT INTO GROUP_MEMBERSHIP (group_id, student_id, role) VALUES (p_group, p_student, 'member')"
+PL/pgSQL function sp_join_group(integer,integer) line 10 at SQL statement
+ROLLBACK
+ROLLBACK
+
+=== Q16 Indexes at work (EXPLAIN ANALYZE)
+--- B-tree on GROUP_MEMBERSHIP(student_id): "which groups is this student in?" (Phase 1 had no index here)
+SET
++---------------------------------------------------------------------------+
+|                                QUERY PLAN                                 |
++---------------------------------------------------------------------------+
+| Bitmap Heap Scan on group_membership (actual rows=1 loops=1)              |
+|   Recheck Cond: (student_id = 5)                                          |
+|   Heap Blocks: exact=1                                                    |
+|   ->  Bitmap Index Scan on idx_membership_student (actual rows=1 loops=1) |
+|         Index Cond: (student_id = 5)                                      |
++---------------------------------------------------------------------------+
+(5 rows)
+
+--- GIN on DOCUMENT.search_tsv: full-text match
++----------------------------------------------------------------------------+
+|                                 QUERY PLAN                                 |
++----------------------------------------------------------------------------+
+| Bitmap Heap Scan on document (actual rows=3 loops=1)                       |
+|   Recheck Cond: (search_tsv @@ '''deadlock'''::tsquery)                    |
+|   Heap Blocks: exact=3                                                     |
+|   ->  Bitmap Index Scan on idx_document_search_tsv (actual rows=3 loops=1) |
+|         Index Cond: (search_tsv @@ '''deadlock'''::tsquery)                |
++----------------------------------------------------------------------------+
+(5 rows)
+
+--- HNSW on DOC_CHUNK.embedding: approximate nearest neighbours
++------------------------------------------------------------------------------------------------+
+|                                           QUERY PLAN                                           |
++------------------------------------------------------------------------------------------------+
+| Limit (actual rows=5 loops=1)                                                                  |
+|   InitPlan 1                                                                                   |
+|     ->  Limit (actual rows=1 loops=1)                                                          |
+|           ->  Index Scan using doc_chunk_pkey on doc_chunk doc_chunk_1 (actual rows=1 loops=1) |
+|   ->  Index Scan using idx_chunk_embedding_hnsw on doc_chunk (actual rows=5 loops=1)           |
+|         Order By: (embedding <=> (InitPlan 1).col1)                                            |
++------------------------------------------------------------------------------------------------+
+(6 rows)
+
+RESET
+
+=== Q17 Index catalogue (pg_indexes)
++----------------------+--------------------------------+------------------------------------------------------------------------+
+|      tablename       |           indexname            |                               definition                               |
++----------------------+--------------------------------+------------------------------------------------------------------------+
+| audit_log            | audit_log_pkey                 | btree (audit_id)                                                       |
+| audit_log            | idx_audit_logged_at            | btree (logged_at DESC)                                                 |
+| bookmark             | bookmark_pkey                  | btree (student_id, doc_id)                                             |
+| bookmark             | idx_bookmark_doc               | btree (doc_id)                                                         |
+| course               | course_course_code_key         | btree (course_code)                                                    |
+| course               | course_pkey                    | btree (course_id)                                                      |
+| doc_chunk            | doc_chunk_pkey                 | btree (chunk_id)                                                       |
+| doc_chunk            | idx_chunk_embedding_hnsw       | hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64') |
+| doc_chunk            | uq_chunk_per_doc               | btree (doc_id, chunk_index)                                            |
+| document             | document_pkey                  | btree (doc_id)                                                         |
+| document             | idx_document_course_visibility | btree (course_id, visibility)                                          |
+| document             | idx_document_embedding_todo    | btree (doc_id) WHERE ((embedding_status)::text <> 'ready'::text)       |
+| document             | idx_document_public_recent     | btree (upload_date DESC) WHERE ((visibility)::text = 'public'::text)   |
+| document             | idx_document_search_tsv        | gin (search_tsv)                                                       |
+| document             | idx_document_student           | btree (student_id)                                                     |
+| document_tag         | document_tag_pkey              | btree (doc_id, tag_id)                                                 |
+| document_tag         | idx_document_tag_tag           | btree (tag_id)                                                         |
+| enrollment           | enrollment_pkey                | btree (student_id, course_id, semester)                                |
+| enrollment           | idx_enrollment_course          | btree (course_id)                                                      |
+| group_membership     | group_membership_pkey          | btree (group_id, student_id)                                           |
+| group_membership     | idx_membership_student         | btree (student_id)                                                     |
+| mv_course_engagement | uq_mv_course_engagement        | btree (course_id)                                                      |
+| search_log           | idx_searchlog_query_ci         | btree (lower((query_text)::text))                                      |
+| search_log           | idx_searchlog_student_time     | btree (student_id, searched_at DESC)                                   |
+| search_log           | idx_searchlog_time             | btree (searched_at DESC)                                               |
+| search_log           | search_log_pkey                | btree (log_id)                                                         |
+| student              | student_pkey                   | btree (student_id)                                                     |
+| student              | uq_student_email_ci            | btree (lower((email)::text))                                           |
+| study_group          | idx_studygroup_course          | btree (course_id)                                                      |
+| study_group          | idx_studygroup_creator         | btree (created_by)                                                     |
+| study_group          | study_group_pkey               | btree (group_id)                                                       |
+| study_group          | uq_group_name_per_course       | btree (course_id, group_name)                                          |
+| tag                  | tag_pkey                       | btree (tag_id)                                                         |
+| tag                  | tag_tag_name_key               | btree (tag_name)                                                       |
++----------------------+--------------------------------+------------------------------------------------------------------------+
+(34 rows)
+
