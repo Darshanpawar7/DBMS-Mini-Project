@@ -23,7 +23,10 @@ export const PATCH = route(async (request, ctx: Ctx) => {
     ...body,
     tags: Array.isArray(body.tags) ? body.tags : splitTags(body.tags),
   });
-  await assertCanUseCourse(user, meta.course_id);
+  const current = await getDocumentForViewer(user.student_id, docId);
+  if (!current) throw new ApiError(404, "Document not found");
+  // keeping the note's existing course is always allowed, even after dropping that course
+  if (meta.course_id !== current.course_id) await assertCanUseCourse(user, meta.course_id);
   await updateDocument(user.student_id, user.role === "admin", docId, meta);
   return ok({ doc_id: docId });
 });

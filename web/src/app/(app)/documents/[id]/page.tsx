@@ -21,10 +21,15 @@ export default async function DocumentPage({ params, searchParams }: PageProps<"
 
   const isEditing = (await searchParams).edit === "1";
   const canEdit = doc.owner_id === user.student_id || user.role === "admin";
-  const [similar, courses] = await Promise.all([
+  const [similar, allowedCourses] = await Promise.all([
     similarDocuments(user.student_id, docId),
     canEdit && isEditing ? (user.role === "admin" ? listAllCourses() : listMyCourses(user.student_id)) : Promise.resolve([]),
   ]);
+  // the note's current course stays selectable even if the owner has since dropped it
+  const courses =
+    doc.course_id !== null && doc.course_code && doc.course_title && !allowedCourses.some((c) => c.course_id === doc.course_id)
+      ? [...allowedCourses, { course_id: doc.course_id, course_code: doc.course_code, course_title: doc.course_title, department: null }]
+      : allowedCourses;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
