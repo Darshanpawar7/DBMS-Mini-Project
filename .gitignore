@@ -1,0 +1,24 @@
+# secrets
+.env
+.env.local
+web/.env
+web/.env.local
+
+# dependencies / build output
+node_modules/
+web/.next/
+web/out/
+web/next-env.d.ts
+*.tsbuildinfo
+
+# runtime data
+web/storage/
+web/.cache/
+web/test-results/
+web/playwright-report/
+
+# OS / editor
+desktop.ini
+.DS_Store
+Thumbs.db
+.vscode/
