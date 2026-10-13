@@ -1,3 +1,4 @@
+import type { PoolClient } from "pg";
 import { query, queryOne, withTransaction } from "@/lib/db";
 import { ApiError } from "@/lib/errors";
 import type { DocumentCard, GroupMemberRow, GroupRecommendation, GroupRow, PartnerRecommendation } from "@/lib/types";
@@ -132,12 +133,11 @@ export async function joinGroup(studentId: number, groupId: number): Promise<voi
   await withTransaction((client) => client.query("CALL sp_join_group($1, $2)", [studentId, groupId]), { actorId: studentId });
 }
 
-/** Leaving may hand the admin role to someone else, or delete an empty group (trigger T7). */
+/** CALL sp_leave_group: locks the group row, then T7 hands over admin or deletes an empty group. */
 export async function leaveGroup(studentId: number, groupId: number): Promise<{ groupStillExists: boolean }> {
   return withTransaction(
     async (client) => {
-      const result = await client.query("DELETE FROM GROUP_MEMBERSHIP WHERE group_id = $1 AND student_id = $2", [groupId, studentId]);
-      if (result.rowCount === 0) throw new ApiError(404, "You are not a member of this group");
+      await client.query("CALL sp_leave_group($1, $2)", [studentId, groupId]);
       const still = await client.query("SELECT 1 FROM STUDY_GROUP WHERE group_id = $1", [groupId]);
       return { groupStillExists: (still.rowCount ?? 0) > 0 };
     },
@@ -145,9 +145,16 @@ export async function leaveGroup(studentId: number, groupId: number): Promise<{ 
   );
 }
 
+/** Serialise every membership change in a group on its row lock (as sp_join_group/sp_leave_group do). */
+async function lockGroup(client: PoolClient, groupId: number): Promise<void> {
+  const { rowCount } = await client.query("SELECT 1 FROM STUDY_GROUP WHERE group_id = $1 FOR UPDATE", [groupId]);
+  if (!rowCount) throw new ApiError(404, "Group not found");
+}
+
 export async function setMemberRole(actorId: number, groupId: number, studentId: number, role: "admin" | "member"): Promise<void> {
   await withTransaction(
     async (client) => {
+      await lockGroup(client, groupId);
       const result = await client.query(
         "UPDATE GROUP_MEMBERSHIP SET role = $3 WHERE group_id = $1 AND student_id = $2",
         [groupId, studentId, role],
@@ -161,6 +168,7 @@ export async function setMemberRole(actorId: number, groupId: number, studentId:
 export async function removeMember(actorId: number, groupId: number, studentId: number): Promise<void> {
   await withTransaction(
     async (client) => {
+      await lockGroup(client, groupId);
       const result = await client.query("DELETE FROM GROUP_MEMBERSHIP WHERE group_id = $1 AND student_id = $2", [groupId, studentId]);
       if (result.rowCount === 0) throw new ApiError(404, "Member not found");
     },

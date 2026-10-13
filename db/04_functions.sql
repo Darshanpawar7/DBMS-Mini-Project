@@ -300,6 +300,25 @@ BEGIN
 END $$;
 
 -- ------------------------------------------------------------
+-- PROCEDURE: leave a study group (transaction-safe).
+-- The group row is locked first, so two members leaving at the same time
+-- are serialised and the admin hand-over / empty-group clean-up in
+-- trigger T7 always sees the other member's change.
+-- ------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE sp_leave_group(p_student INT, p_group INT)
+LANGUAGE plpgsql AS $$
+BEGIN
+    PERFORM 1 FROM STUDY_GROUP WHERE group_id = p_group FOR UPDATE;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Study group % does not exist', p_group USING ERRCODE = 'SM404';
+    END IF;
+    DELETE FROM GROUP_MEMBERSHIP WHERE group_id = p_group AND student_id = p_student;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'You are not a member of this group' USING ERRCODE = 'SM404';
+    END IF;
+END $$;
+
+-- ------------------------------------------------------------
 -- PROCEDURE: merge one tag into another (admin clean-up), all-or-nothing.
 -- ------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE sp_merge_tags(p_from VARCHAR, p_into VARCHAR)

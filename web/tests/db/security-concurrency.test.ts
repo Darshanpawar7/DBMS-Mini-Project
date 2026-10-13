@@ -79,4 +79,38 @@ describe("transactions", () => {
       setup.release();
     }
   });
+
+  test("the last two members leaving at the same moment never leave an orphan group", async () => {
+    const setup = await pool.connect();
+    let gid = 0;
+    try {
+      const creator = await studentId(setup, "meera.pillai");
+      const other = await studentId(setup, "priya.nair");
+      gid = await scalar<number>(
+        setup,
+        "INSERT INTO STUDY_GROUP (group_name, max_members, course_id, created_by) VALUES ('Leave race test', 4, $1, $2) RETURNING group_id",
+        [await courseId(setup, "UE23CS352A"), creator],
+      );
+      await setup.query("CALL sp_join_group($1, $2)", [other, gid]);
+
+      const [a, b] = await Promise.all([pool.connect(), pool.connect()]);
+      try {
+        await Promise.all([a.query("BEGIN"), b.query("BEGIN")]);
+        const results = await Promise.allSettled([
+          a.query("CALL sp_leave_group($1, $2)", [creator, gid]).then(() => a.query("COMMIT")),
+          b.query("CALL sp_leave_group($1, $2)", [other, gid]).then(() => b.query("COMMIT")),
+        ]);
+        expect(results.every((r) => r.status === "fulfilled")).toBe(true);
+        // T7 ran in both transactions, one after the other: the group is gone, not left empty
+        expect(await scalar<number>(setup, "SELECT COUNT(*)::INT FROM STUDY_GROUP WHERE group_id = $1", [gid])).toBe(0);
+        gid = 0;
+      } finally {
+        a.release();
+        b.release();
+      }
+    } finally {
+      if (gid) await setup.query("DELETE FROM STUDY_GROUP WHERE group_id = $1", [gid]);
+      setup.release();
+    }
+  });
 });
