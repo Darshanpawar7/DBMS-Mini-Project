@@ -98,6 +98,12 @@ export default async function LandingPage() {
           ))}
         </div>
       </section>
+
+      <footer className="border-t border-line">
+        <p className="mx-auto max-w-6xl px-6 py-6 text-xs text-muted">
+          DBMS Mini Project · PES University · Darshan P Pawar (PES2UG24CS143) &amp; Dhanush V Biradar (PES2UG24CS155)
+        </p>
+      </footer>
     </div>
   );
 }
