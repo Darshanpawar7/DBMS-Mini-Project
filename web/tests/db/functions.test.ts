@@ -112,6 +112,26 @@ describe("recommendations", () => {
     });
   });
 
+  test("private notes never shape what other students are shown", async () => {
+    await inRolledBackTx(async (c) => {
+      const ananya = await studentId(c, "ananya.rao");
+      const meera = await studentId(c, "meera.pillai"); // member of "Attention Is All We Need"
+      const dl = await courseId(c, "UE23CS353A");
+      // Ananya has a public DL note tagged #secret-topic; Meera has only a PRIVATE one
+      for (const [owner, visibility] of [[ananya, "public"], [meera, "private"]] as const) {
+        const doc = await scalar<number>(
+          c,
+          "INSERT INTO DOCUMENT (title, file_path, file_type, visibility, content, student_id, course_id) VALUES ('Probe note', 'p.md', 'md', $1, 'probe text', $2, $3) RETURNING doc_id",
+          [visibility, owner, dl],
+        );
+        await c.query("INSERT INTO TAG (tag_name) VALUES ('secret-topic') ON CONFLICT DO NOTHING");
+        await c.query("INSERT INTO DOCUMENT_TAG SELECT $1, tag_id FROM TAG WHERE tag_name = 'secret-topic'", [doc]);
+      }
+      const recs = await c.query("SELECT shared_tags FROM fn_recommend_groups($1, 10)", [ananya]);
+      expect(recs.rows.flatMap((r) => r.shared_tags)).not.toContain("secret-topic");
+    });
+  });
+
   test("study partners share at least one course", async () => {
     await inRolledBackTx(async (c) => {
       const rows = await c.query("SELECT shared_courses FROM fn_recommend_partners($1, 10)", [await studentId(c, "ananya.rao")]);

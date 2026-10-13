@@ -195,8 +195,9 @@ $$;
 --   match_score = 0.7 * cosine(student interest, group interest)
 --               + 0.3 * Jaccard(student's topics, group's topics)
 -- Group interest = mean of its members' interest vectors.
--- "Topics" = tags of the documents someone uploaded or bookmarked
--- *within the group's course*, so shared topics are course-relevant.
+-- "Topics" = tags of the non-private documents someone uploaded or
+-- bookmarked *within the group's course*, so shared topics are
+-- course-relevant and never reveal what is in someone's private notes.
 -- ------------------------------------------------------------
 CREATE OR REPLACE FUNCTION fn_recommend_groups(p_student INT, p_limit INT DEFAULT 5)
 RETURNS TABLE (group_id INT, group_name VARCHAR, course_code VARCHAR, member_count INT, seats_left INT,
@@ -209,7 +210,7 @@ LANGUAGE sql STABLE AS $$
         FROM (SELECT student_id, doc_id FROM DOCUMENT
               UNION
               SELECT student_id, doc_id FROM BOOKMARK) a
-        JOIN DOCUMENT d      ON d.doc_id = a.doc_id AND d.course_id IS NOT NULL
+        JOIN DOCUMENT d      ON d.doc_id = a.doc_id AND d.course_id IS NOT NULL AND d.visibility <> 'private'
         JOIN DOCUMENT_TAG dt ON dt.doc_id = d.doc_id
         JOIN TAG t           ON t.tag_id = dt.tag_id
     ), candidates AS (

@@ -77,14 +77,19 @@ GROUP BY doc_id;
 -- documents they uploaded, the documents they bookmarked, and the
 -- queries they searched in the last 120 days. This is what lets the
 -- database match study partners by meaning, not just by course.
+-- Private notes are left out: these vectors are compared with other
+-- students, and a private note must not influence what others see.
 -- ------------------------------------------------------------
 CREATE VIEW v_student_interest AS
 WITH signals AS (
     SELECT d.student_id, c.centroid AS vec, 'upload' AS source
     FROM DOCUMENT d JOIN v_doc_centroid c ON c.doc_id = d.doc_id
+    WHERE d.visibility <> 'private'
     UNION ALL
     SELECT b.student_id, c.centroid, 'bookmark'
-    FROM BOOKMARK b JOIN v_doc_centroid c ON c.doc_id = b.doc_id
+    FROM BOOKMARK b
+    JOIN DOCUMENT d       ON d.doc_id = b.doc_id AND d.visibility <> 'private'
+    JOIN v_doc_centroid c ON c.doc_id = b.doc_id
     UNION ALL
     SELECT l.student_id, l.query_embedding, 'search'
     FROM SEARCH_LOG l
