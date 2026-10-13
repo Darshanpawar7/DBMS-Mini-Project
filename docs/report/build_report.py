@@ -461,13 +461,37 @@ COVERAGE = """
 
 CONTRIB = """
 <h2 id="s18">18. Individual contributions and version control</h2>
-<p class="todo-block">Fill in before submission: replace the placeholders with each member's name and what they actually did, so it matches
-the commit history.</p>
-<table class="grid"><thead><tr><th>Member</th><th>Database work</th><th>Application work</th></tr></thead><tbody>
-<tr><td>Darshan (PES2UG24CS143)</td><td><span class="todo">e.g. schema &amp; Phase 1 fixes, triggers, search functions, seed data</span></td>
-<td><span class="todo">e.g. search UI, upload pipeline, embedding worker</span></td></tr>
-<tr><td><span class="todo">Member 2 (SRN)</span></td><td><span class="todo">e.g. views, procedures, grants, important queries</span></td>
-<td><span class="todo">e.g. authentication, groups &amp; admin pages, tests</span></td></tr>
+<p>Both members worked on the database and on the application, as the brief requires. Each owned one end-to-end
+slice — <b>notes and search</b> (Darshan) and <b>people, groups and administration</b> (Dhanush) — and reviewed the other's work.</p>
+<table class="grid"><thead><tr><th style="width:22%">Member</th><th>Database work</th><th>Application work</th></tr></thead><tbody>
+<tr><td><b>Darshan P Pawar</b><br/>PES2UG24CS143</td>
+<td><ul>
+<li>Phase 1 ER diagram, schema and DDL; Phase 1 review and fixes (§5)</li>
+<li>Phase 2 schema evolution (<code>ALTER</code>s, DOC_CHUNK, AUDIT_LOG, CHECK constraints, indexes)</li>
+<li>pgvector set-up, HNSW and GIN indexes, chunking function and document triggers (T3, T4)</li>
+<li>Keyword, semantic and hybrid search functions; similarity threshold calibration</li>
+<li>Seed data (courses, students, 33 study notes)</li>
+</ul></td>
+<td><ul>
+<li>Upload pipeline (PDF/text extraction, one-transaction save, embedding worker)</li>
+<li>Search page, library, note detail and upload pages</li>
+<li>Database setup script and embedding job</li>
+<li>Report, ER and architecture diagrams, screenshots</li>
+</ul></td></tr>
+<tr><td><b>Dhanush V Biradar</b><br/>PES2UG24CS155</td>
+<td><ul>
+<li>Views and the materialized view; interest-profile view</li>
+<li>Study-group triggers (seat limit, creator admin, succession, guards) and procedures <code>sp_join_group</code>, <code>sp_leave_group</code>, <code>sp_merge_tags</code></li>
+<li>Recommendation functions (groups and partners)</li>
+<li>Audit trigger, least-privilege app role and grants</li>
+<li>Important-queries script (§13) and EXPLAIN analysis</li>
+</ul></td>
+<td><ul>
+<li>Authentication, sessions, roles and the proxy gate; security hardening</li>
+<li>API layer: validation, error mapping, CSRF check, rate limiting</li>
+<li>Dashboard, study groups, courses and all admin pages (charts, users, audit log)</li>
+<li>Automated tests: unit, database integration and Playwright end-to-end</li>
+</ul></td></tr>
 </tbody></table>
 <p>Repository: <code>https://github.com/Darshanpawar7/DBMS-Mini-Project</code>. It contains <code>db/</code> (SQL), <code>web/</code> (Next.js app and tests) and <code>docs/</code> (this report, diagrams,
 screenshots). Each member commits their own work from their own GitHub account (feature branches merged by pull request), so the history
@@ -534,6 +558,8 @@ figcaption { font-size: 9pt; color: #475569; margin-top: 4px; }
 .cover .subtitle { font-size: 15pt; color: #334155; margin: 6px 0 26px; font-family: Georgia, serif; }
 table.meta th { text-align: left; width: 32mm; color: #64748b; font-weight: 600; padding: 5px 8px 5px 0; vertical-align: top; }
 table.meta td { padding: 5px 0; border-bottom: 1px solid #e2e8f0; }
+table.grid td ul { margin: 0; padding-left: 16px; }
+table.grid td li { margin: 1px 0; }
 .cover-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 26px; }
 .cover-stats.small { grid-template-columns: repeat(4, 1fr); margin: 8px 0 14px; }
 .cover-stats div { background: #eef2ff; border-radius: 8px; padding: 10px; text-align: center; }

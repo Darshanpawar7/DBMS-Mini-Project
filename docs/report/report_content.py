@@ -8,7 +8,7 @@ COVER = """
   <table class="meta">
     <tr><th>Course</th><td>DBMS Experiential Learning — Level 3 Project</td></tr>
     <tr><th>Institution</th><td>PES University, Electronic City Campus · Department of Computer Science and Engineering</td></tr>
-    <tr><th>Team</th><td>Darshan (SRN PES2UG24CS143)<br/><span class="todo">Team member 2 — name and SRN</span></td></tr>
+    <tr><th>Team</th><td>Darshan P Pawar — SRN PES2UG24CS143<br/>Dhanush V Biradar — SRN PES2UG24CS155</td></tr>
     <tr><th>Database option</th><td>Option 2 — SQL (PostgreSQL 17) + Vector database (pgvector)</td></tr>
     <tr><th>Phase 2 scope</th><td>Phase 1 review and fixes · DML and seed data · vector search · advanced database features ·
       Next.js application with authentication and roles · security · testing · documentation</td></tr>
