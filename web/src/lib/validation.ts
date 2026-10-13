@@ -34,7 +34,9 @@ export const SEARCH_MODES = ["hybrid", "semantic", "keyword"] as const;
 const tagListSchema = z
   .array(z.string().trim().toLowerCase().regex(/^[a-z0-9][a-z0-9+#. -]{0,49}$/, "Tags: letters, digits, - + # ."))
   .max(8, "At most 8 tags")
-  .default([]);
+  .default([])
+  // same normalisation as the database trigger, so the tags can be linked after upsert
+  .transform((tags) => [...new Set(tags.map((t) => t.replace(/\s+/g, "-")))]);
 
 /** Parse "sql, Query Tuning ,indexing" into a clean, unique list. */
 export function splitTags(raw: unknown): string[] {

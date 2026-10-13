@@ -104,3 +104,10 @@ describe("other schemas", () => {
     expect(searchSchema.safeParse({ q: "bcnf", mode: "fuzzy" }).success).toBe(false);
   });
 });
+
+describe("tag normalisation", () => {
+  test("array tags with spaces are hyphenated and de-duplicated like the database trigger does", () => {
+    const meta = documentMetaSchema.parse({ title: "Notes", visibility: "public", course_id: "", tags: ["Machine Learning", "machine learning", "sql"] });
+    expect(meta.tags).toEqual(["machine-learning", "sql"]);
+  });
+});
