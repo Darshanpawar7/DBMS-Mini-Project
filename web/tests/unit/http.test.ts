@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ApiError, assertSameOrigin, parseId, readJson, toErrorResponse } from "@/lib/http";
 import { highlightParts, formatBytes, timeAgo } from "@/lib/format";
 import { rateLimit } from "@/lib/rate-limit";
+import { safeNextPath } from "@/lib/safe-redirect";
 
 async function body(response: Response): Promise<{ ok: boolean; error: { message: string; fields?: Record<string, string> } }> {
   return response.json();
@@ -95,5 +96,20 @@ describe("rateLimit", () => {
       expect((error as ApiError).status).toBe(429);
     }
     expect(() => rateLimit(`${key}:other-user`, 3, 60_000)).not.toThrow();
+  });
+});
+
+describe("safeNextPath (post-login redirect)", () => {
+  const origin = "http://localhost:3000";
+  test.each([
+    ["/groups/3", "/groups/3"],
+    ["/search?q=bcnf", "/search?q=bcnf"],
+    ["//evil.com", "/dashboard"],
+    ["/\\evil.com", "/dashboard"], // a backslash counts as a slash in http(s) URLs
+    ["/%5Cevil.com", "/%5Cevil.com"], // percent-encoded stays a harmless local path
+    ["https://evil.com/login", "/dashboard"],
+    ["javascript:alert(1)", "/dashboard"],
+  ])("%s -> %s", (next, expected) => {
+    expect(safeNextPath(next, origin)).toBe(expected);
   });
 });

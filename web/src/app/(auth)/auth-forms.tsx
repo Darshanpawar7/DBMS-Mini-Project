@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { apiFetch } from "@/components/api-client";
 import { Alert, Field, buttonClass, inputClass } from "@/components/ui";
+import { safeNextPath } from "@/lib/safe-redirect";
 
 type FieldErrors = Record<string, string>;
 
@@ -25,7 +26,7 @@ function useSubmit(url: string, next: string) {
       setFields(result.error.fields ?? {});
       return;
     }
-    const target = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+    const target = safeNextPath(next, window.location.origin);
     router.replace(result.data.user.role === "admin" && target === "/dashboard" ? "/admin" : target);
     router.refresh();
   }
