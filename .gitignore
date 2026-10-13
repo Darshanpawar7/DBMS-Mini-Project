@@ -22,3 +22,6 @@ desktop.ini
 .DS_Store
 Thumbs.db
 .vscode/
+
+# python caches (report generator)
+__pycache__/
