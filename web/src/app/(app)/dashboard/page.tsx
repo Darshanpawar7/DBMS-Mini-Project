@@ -18,7 +18,7 @@ export default async function DashboardPage() {
     recentFeed(user.student_id, 6),
     recommendGroups(user.student_id, 3),
     recommendPartners(user.student_id, 4),
-    trendingTags(10),
+    trendingTags(user.student_id, 10),
     recentSearches(user.student_id, 5),
   ]);
   const firstName = user.full_name.split(" ")[0];

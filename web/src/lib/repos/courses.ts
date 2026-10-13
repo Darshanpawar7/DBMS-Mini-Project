@@ -9,12 +9,13 @@ export interface CourseWithStats extends CourseRow {
   my_semesters: string[];
 }
 
-/** Every course with live counts, plus the semesters the given student is enrolled in. */
+/** Every course with live counts (notes: only those the student may see), plus the student's semesters. */
 export function listCoursesWithStats(studentId: number): Promise<CourseWithStats[]> {
   return query<CourseWithStats>(
     `SELECT c.course_id, c.course_code, c.course_title, c.department,
             COUNT(DISTINCT e.student_id)::INT AS enrolled_students,
-            (SELECT COUNT(*) FROM DOCUMENT d WHERE d.course_id = c.course_id)::INT AS documents,
+            (SELECT COUNT(*) FROM DOCUMENT d JOIN fn_visible_doc_ids($1) v ON v.doc_id = d.doc_id
+              WHERE d.course_id = c.course_id)::INT AS documents,
             (SELECT COUNT(*) FROM STUDY_GROUP g WHERE g.course_id = c.course_id)::INT AS study_groups,
             COALESCE(array_agg(e.semester ORDER BY e.semester) FILTER (WHERE e.student_id = $1), '{}') AS my_semesters
      FROM COURSE c

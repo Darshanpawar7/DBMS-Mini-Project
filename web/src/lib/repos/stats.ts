@@ -37,20 +37,21 @@ export interface TrendingTag {
   recent_bookmarks: number;
 }
 
-/** Tags used by 2+ documents, ranked by bookmarks in the last 30 days (GROUP BY + HAVING). */
-export function trendingTags(limit = 10): Promise<TrendingTag[]> {
+/** Tags on 2+ notes the viewer can see, ranked by bookmarks in the last 30 days (GROUP BY + HAVING). */
+export function trendingTags(viewerId: number, limit = 10): Promise<TrendingTag[]> {
   return query<TrendingTag>(
     `SELECT t.tag_name,
             COUNT(DISTINCT dt.doc_id)::INT AS documents,
             COUNT(b.student_id)::INT       AS recent_bookmarks
      FROM TAG t
      JOIN DOCUMENT_TAG dt ON dt.tag_id = t.tag_id
+     JOIN fn_visible_doc_ids($1) v ON v.doc_id = dt.doc_id
      LEFT JOIN BOOKMARK b ON b.doc_id = dt.doc_id AND b.bookmarked_at > CURRENT_TIMESTAMP - INTERVAL '30 days'
      GROUP BY t.tag_id
      HAVING COUNT(DISTINCT dt.doc_id) >= 2
      ORDER BY recent_bookmarks DESC, documents DESC, t.tag_name
-     LIMIT $1`,
-    [limit],
+     LIMIT $2`,
+    [viewerId, limit],
   );
 }
 

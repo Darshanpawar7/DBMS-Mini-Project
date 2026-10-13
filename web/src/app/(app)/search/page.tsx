@@ -16,7 +16,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
   // a shared link such as /search?q=... renders its results on the server
   const [courses, tags, initial] = await Promise.all([
     listAllCourses(),
-    listTags(1),
+    listTags(user.student_id, 1),
     parsed.success ? runSearch(user.student_id, parsed.data) : Promise.resolve<SearchResponse | null>(null),
   ]);
 

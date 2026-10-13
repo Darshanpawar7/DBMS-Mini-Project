@@ -202,16 +202,20 @@ export interface TagCount {
   documents: number;
 }
 
-/** Tag vocabulary with usage counts (GROUP BY ... HAVING). */
-export function listTags(minDocuments = 1): Promise<TagCount[]> {
+/**
+ * Tag vocabulary with usage counts (GROUP BY ... HAVING), counting only notes
+ * the viewer may see -- a private note's tags must not show up for others.
+ */
+export function listTags(viewerId: number, minDocuments = 1): Promise<TagCount[]> {
   return query<TagCount>(
-    `SELECT t.tag_name, COUNT(dt.doc_id)::INT AS documents
+    `SELECT t.tag_name, COUNT(v.doc_id)::INT AS documents
      FROM TAG t
      LEFT JOIN DOCUMENT_TAG dt ON dt.tag_id = t.tag_id
+     LEFT JOIN fn_visible_doc_ids($1) v ON v.doc_id = dt.doc_id
      GROUP BY t.tag_id
-     HAVING COUNT(dt.doc_id) >= $1
+     HAVING COUNT(v.doc_id) >= $2
      ORDER BY documents DESC, t.tag_name`,
-    [minDocuments],
+    [viewerId, minDocuments],
   );
 }
 

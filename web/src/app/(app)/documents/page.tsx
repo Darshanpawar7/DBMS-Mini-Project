@@ -20,7 +20,7 @@ export default async function LibraryPage({ searchParams }: PageProps<"/document
   const raw = await searchParams;
   const parsed = documentListSchema.safeParse(raw);
   const filters = parsed.success ? parsed.data : documentListSchema.parse({});
-  const [{ items, total }, courses, tags] = await Promise.all([listDocuments(user.student_id, filters), listAllCourses(), listTags(1)]);
+  const [{ items, total }, courses, tags] = await Promise.all([listDocuments(user.student_id, filters), listAllCourses(), listTags(user.student_id, 1)]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // build links that keep the other filters (URL is the source of truth)

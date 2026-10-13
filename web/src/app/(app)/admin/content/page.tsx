@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Courses & tags" };
 
 export default async function AdminContentPage() {
   const admin = await requireAdminPage();
-  const [courses, tags] = await Promise.all([listCoursesWithStats(admin.student_id), listTags(0)]);
+  const [courses, tags] = await Promise.all([listCoursesWithStats(admin.student_id), listTags(admin.student_id, 0)]);
 
   return (
     <>
