@@ -19,8 +19,10 @@ DBMS Level 3 mini project, PES University (EC Campus), Dept. of CSE. Database op
 | Auth | bcrypt password hashes, signed JWT in an httpOnly cookie, roles `student` / `admin` |
 | Tests | Vitest (unit + database integration), Playwright (end-to-end) |
 
-The full write-up (ER diagram, schema, data dictionary, queries, screenshots, test results) is in
-[`docs/ScholarMesh_Phase2_Report.pdf`](docs/ScholarMesh_Phase2_Report.pdf).
+- **New here?** Start with the short, plain-language guide — what it is, tech stack, how it works, screenshots and
+  setup: [`docs/ScholarMesh_Project_Guide.pdf`](docs/ScholarMesh_Project_Guide.pdf).
+- The full technical write-up (ER diagram, schema, data dictionary, queries, test results) is
+  [`docs/ScholarMesh_Phase2_Report.pdf`](docs/ScholarMesh_Phase2_Report.pdf).
 
 ---
 
