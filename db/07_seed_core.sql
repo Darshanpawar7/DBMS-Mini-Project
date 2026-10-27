@@ -24,8 +24,8 @@ SELECT v.full_name, v.email, v.password_hash, v.program, v.year_of_study, v.role
 FROM (VALUES
     ('Platform Admin'::varchar, 'admin@scholarmesh.test'::varchar,
      '$2b$10$NLNHSrtE0tFq0PvOsHURTezWDAQT2X7LrJcdqmGqcJ6P4Yl4pcyR6'::varchar, 'Faculty'::varchar, NULL::smallint, 'admin'::varchar, INTERVAL '70 days'),
-    ('Ananya Rao',      'ananya.rao@scholarmesh.test',      '$2b$10$eVEm2DOaG1Mk25bD3vc1S.Z4KRSeUUpEoi3fI96MSZ4m1SKHpDRbK', 'B.Tech CSE',           3, 'student', INTERVAL '60 days'),
-    ('Rahul Verma',     'rahul.verma@scholarmesh.test',     '$2b$10$eVEm2DOaG1Mk25bD3vc1S.Z4KRSeUUpEoi3fI96MSZ4m1SKHpDRbK', 'B.Tech CSE',           3, 'student', INTERVAL '58 days'),
+    ('Darshan P Pawar',      'darshan.pawar@scholarmesh.test',      '$2b$10$eVEm2DOaG1Mk25bD3vc1S.Z4KRSeUUpEoi3fI96MSZ4m1SKHpDRbK', 'B.Tech CSE',           3, 'student', INTERVAL '60 days'),
+    ('Dhanush V Biradar',     'dhanush.biradar@scholarmesh.test',     '$2b$10$eVEm2DOaG1Mk25bD3vc1S.Z4KRSeUUpEoi3fI96MSZ4m1SKHpDRbK', 'B.Tech CSE',           3, 'student', INTERVAL '58 days'),
     ('Priya Nair',      'priya.nair@scholarmesh.test',      '$2b$10$eVEm2DOaG1Mk25bD3vc1S.Z4KRSeUUpEoi3fI96MSZ4m1SKHpDRbK', 'B.Tech CSE (AI & ML)', 3, 'student', INTERVAL '57 days'),
     ('Karthik Iyer',    'karthik.iyer@scholarmesh.test',    '$2b$10$eVEm2DOaG1Mk25bD3vc1S.Z4KRSeUUpEoi3fI96MSZ4m1SKHpDRbK', 'B.Tech CSE',           3, 'student', INTERVAL '55 days'),
     ('Sneha Kulkarni',  'sneha.kulkarni@scholarmesh.test',  '$2b$10$eVEm2DOaG1Mk25bD3vc1S.Z4KRSeUUpEoi3fI96MSZ4m1SKHpDRbK', 'B.Tech CSE (AI & ML)', 3, 'student', INTERVAL '54 days'),
@@ -46,10 +46,10 @@ FROM (VALUES
 INSERT INTO ENROLLMENT (student_id, course_id, semester)
 SELECT s.student_id, c.course_id, v.semester
 FROM (VALUES
-    ('ananya.rao',     'UE23CS351A', '2026-ODD'), ('ananya.rao',     'UE23CS352A', '2026-ODD'),
-    ('ananya.rao',     'UE23CS353A', '2026-ODD'), ('ananya.rao',     'UE23CS343A', '2026-ODD'),
-    ('rahul.verma',    'UE23CS351A', '2026-ODD'), ('rahul.verma',    'UE23CS341A', '2026-ODD'),
-    ('rahul.verma',    'UE23CS342A', '2026-ODD'), ('rahul.verma',    'UE23CS343A', '2026-ODD'),
+    ('darshan.pawar',     'UE23CS351A', '2026-ODD'), ('darshan.pawar',     'UE23CS352A', '2026-ODD'),
+    ('darshan.pawar',     'UE23CS353A', '2026-ODD'), ('darshan.pawar',     'UE23CS343A', '2026-ODD'),
+    ('dhanush.biradar',    'UE23CS351A', '2026-ODD'), ('dhanush.biradar',    'UE23CS341A', '2026-ODD'),
+    ('dhanush.biradar',    'UE23CS342A', '2026-ODD'), ('dhanush.biradar',    'UE23CS343A', '2026-ODD'),
     ('priya.nair',     'UE23CS352A', '2026-ODD'), ('priya.nair',     'UE23CS353A', '2026-ODD'),
     ('priya.nair',     'UE23MA241B', '2026-ODD'), ('priya.nair',     'UE23CS351A', '2026-ODD'),
     ('karthik.iyer',   'UE23CS341A', '2026-ODD'), ('karthik.iyer',   'UE23CS342A', '2026-ODD'),
@@ -79,7 +79,7 @@ FROM (VALUES
     ('tanvi.hegde',    'UE23CS351A', '2026-ODD'), ('tanvi.hegde',    'UE23CS341A', '2026-ODD'),
     ('tanvi.hegde',    'UE23CS344A', '2026-ODD'), ('tanvi.hegde',    'UE23CS352A', '2026-ODD'),
     -- earlier semester (a student can take a course in more than one semester)
-    ('ananya.rao',     'UE23MA241B', '2025-EVEN'), ('rahul.verma',    'UE23CS352A', '2025-EVEN'),
+    ('darshan.pawar',     'UE23MA241B', '2025-EVEN'), ('dhanush.biradar',    'UE23CS352A', '2025-EVEN'),
     ('karthik.iyer',   'UE23CS343A', '2025-EVEN'), ('meera.pillai',   'UE23CS351A', '2025-EVEN')
 ) AS v(handle, course_code, semester)
 JOIN STUDENT s ON s.email = v.handle || '@scholarmesh.test'

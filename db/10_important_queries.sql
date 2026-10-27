@@ -7,7 +7,7 @@
 -- ============================================================
 \pset pager off
 \pset border 2
-\set ananya '(SELECT student_id FROM STUDENT WHERE email = ''ananya.rao@scholarmesh.test'')'
+\set darshan '(SELECT student_id FROM STUDENT WHERE email = ''darshan.pawar@scholarmesh.test'')'
 
 \echo '\n=== Q1  JOIN (4 tables) + ORDER BY: the 5 most-saved public notes with owner and course'
 SELECT d.title, s.full_name AS owner, c.course_code, COUNT(b.student_id) AS saves
@@ -91,25 +91,25 @@ SELECT course_code, enrolled_students, documents, bookmarks, study_groups, group
 
 \echo '\n=== Q10 Full-text search: GIN index, websearch syntax, ranking and highlighted snippet'
 SELECT d.title, ROUND(k.rank::NUMERIC, 3) AS rank, k.snippet
-FROM fn_keyword_search(:ananya, 'deadlock OR "page fault"', 5) k
+FROM fn_keyword_search(:darshan, 'deadlock OR "page fault"', 5) k
 JOIN DOCUMENT d USING (doc_id);
 
 \echo '\n=== Q11 Vector similarity search: nearest passages to a logged question (cosine distance <=>)'
 SELECT d.title, ROUND(s.similarity::NUMERIC, 3) AS similarity, LEFT(s.snippet, 70) AS best_passage
-FROM fn_semantic_search(:ananya,
+FROM fn_semantic_search(:darshan,
         (SELECT query_embedding FROM SEARCH_LOG WHERE query_text = 'how do models focus on the important words' LIMIT 1), 5) s
 JOIN DOCUMENT d USING (doc_id);
 
 \echo '\n=== Q12 Hybrid search: Reciprocal Rank Fusion of the two rankings'
 SELECT d.title, h.keyword_rank, h.semantic_rank, ROUND(h.score::NUMERIC, 4) AS rrf_score
-FROM fn_hybrid_search(:ananya, 'gradient',
+FROM fn_hybrid_search(:darshan, 'gradient',
         (SELECT query_embedding FROM SEARCH_LOG WHERE query_text = 'why do gradients vanish in deep networks' LIMIT 1), 6) h
 JOIN DOCUMENT d USING (doc_id);
 
-\echo '\n=== Q13 Study-group matching and study partners for Ananya'
+\echo '\n=== Q13 Study-group matching and study partners for Darshan'
 SELECT group_name, course_code, seats_left, ROUND(similarity::NUMERIC, 3) AS similarity, shared_tags, ROUND(match_score::NUMERIC, 3) AS match_score
-FROM fn_recommend_groups(:ananya, 5);
-SELECT full_name, shared_courses, ROUND(similarity::NUMERIC, 3) AS similarity FROM fn_recommend_partners(:ananya, 5);
+FROM fn_recommend_groups(:darshan, 5);
+SELECT full_name, shared_courses, ROUND(similarity::NUMERIC, 3) AS similarity FROM fn_recommend_partners(:darshan, 5);
 
 \echo '\n=== Q14 DML inside a transaction: INSERT, UPDATE, DELETE, INSERT ... SELECT, then ROLLBACK'
 BEGIN;
@@ -119,14 +119,14 @@ INSERT INTO DOCUMENT_TAG (doc_id, tag_id)
     SELECT d.doc_id, t.tag_id FROM DOCUMENT d, TAG t
     WHERE d.file_path = 'seed/acid-isolation-levels.md' AND t.tag_name = 'write-ahead-logging'
     RETURNING doc_id, tag_id;
-DELETE FROM BOOKMARK WHERE student_id = :ananya RETURNING doc_id;
-SELECT COUNT(*) AS ananya_bookmarks_inside_tx FROM BOOKMARK WHERE student_id = :ananya;
+DELETE FROM BOOKMARK WHERE student_id = :darshan RETURNING doc_id;
+SELECT COUNT(*) AS darshan_bookmarks_inside_tx FROM BOOKMARK WHERE student_id = :darshan;
 ROLLBACK;
-SELECT COUNT(*) AS ananya_bookmarks_after_rollback FROM BOOKMARK WHERE student_id = :ananya;
+SELECT COUNT(*) AS darshan_bookmarks_after_rollback FROM BOOKMARK WHERE student_id = :darshan;
 
 \echo '\n=== Q15 Stored procedure + triggers: a valid join succeeds, joining a full group fails (SM001)'
 -- CALL arguments cannot be sub-queries, so look the ids up first (\gset stores them in psql variables)
-SELECT student_id AS me         FROM STUDENT     WHERE email = 'ananya.rao@scholarmesh.test' \gset
+SELECT student_id AS me         FROM STUDENT     WHERE email = 'darshan.pawar@scholarmesh.test' \gset
 SELECT student_id AS tanvi      FROM STUDENT     WHERE email = 'tanvi.hegde@scholarmesh.test' \gset
 SELECT group_id   AS open_group FROM STUDY_GROUP WHERE group_name = 'Gradient Descenders' \gset
 SELECT group_id   AS full_group FROM STUDY_GROUP WHERE group_name = 'Query Optimizers' \gset

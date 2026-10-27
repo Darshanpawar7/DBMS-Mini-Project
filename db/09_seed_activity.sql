@@ -51,7 +51,7 @@ JOIN TAG t ON t.tag_name = tag.name;
 INSERT INTO STUDY_GROUP (group_name, description, max_members, course_id, created_by, created_at)
 SELECT v.group_name, v.description, v.max_members, c.course_id, s.student_id, CURRENT_TIMESTAMP - v.age
 FROM (VALUES
-    ('Normal Form Ninjas'::varchar, 'Weekly DBMS problem sets: decomposition, FDs and past-paper SQL.'::varchar, 6::smallint, 'UE23CS351A'::varchar, 'rahul.verma'::varchar, INTERVAL '30 days'),
+    ('Normal Form Ninjas'::varchar, 'Weekly DBMS problem sets: decomposition, FDs and past-paper SQL.'::varchar, 6::smallint, 'UE23CS351A'::varchar, 'dhanush.biradar'::varchar, INTERVAL '30 days'),
     ('Query Optimizers',         'Indexes, query plans and EXPLAIN ANALYZE practice before the lab exam.', 4, 'UE23CS351A', 'karthik.iyer',   INTERVAL '28 days'),
     ('Gradient Descenders',      'Working through ML maths: regression, regularisation and optimisation.',  6, 'UE23CS352A', 'meera.pillai',   INTERVAL '26 days'),
     ('Kernel Trick Club',        'Classification models, SVMs and evaluation metrics — bring questions.',  5, 'UE23CS352A', 'aditya.joshi',   INTERVAL '21 days'),
@@ -71,7 +71,7 @@ FROM (VALUES
     ('Normal Form Ninjas',       'diya.shah',      INTERVAL '1 day'),
     ('Normal Form Ninjas',       'vikram.reddy',   INTERVAL '2 days'),
     ('Normal Form Ninjas',       'tanvi.hegde',    INTERVAL '4 days'),
-    ('Normal Form Ninjas',       'ananya.rao',     INTERVAL '6 days'),
+    ('Normal Form Ninjas',       'darshan.pawar',     INTERVAL '6 days'),
     ('Query Optimizers',         'aditya.joshi',   INTERVAL '1 day'),
     ('Query Optimizers',         'ishita.das',     INTERVAL '3 days'),
     ('Query Optimizers',         'priya.nair',     INTERVAL '5 days'),
@@ -82,12 +82,12 @@ FROM (VALUES
     ('Attention Is All We Need', 'kavya.menon',    INTERVAL '1 day'),
     ('Attention Is All We Need', 'siddharth.rao',  INTERVAL '2 days'),
     ('Attention Is All We Need', 'meera.pillai',   INTERVAL '3 days'),
-    ('Packet Pushers',           'rahul.verma',    INTERVAL '1 day'),
+    ('Packet Pushers',           'dhanush.biradar',    INTERVAL '1 day'),
     ('Packet Pushers',           'nikhil.bhat',    INTERVAL '2 days'),
     ('Packet Pushers',           'tanvi.hegde',    INTERVAL '5 days'),
     ('Kernel Panic',             'vikram.reddy',   INTERVAL '1 day'),
     ('Kernel Panic',             'siddharth.rao',  INTERVAL '3 days'),
-    ('DP on Trees',              'ananya.rao',     INTERVAL '1 day'),
+    ('DP on Trees',              'darshan.pawar',     INTERVAL '1 day'),
     ('DP on Trees',              'rohan.gupta',    INTERVAL '2 days'),
     ('DP on Trees',              'meera.pillai',   INTERVAL '4 days')
 ) AS v(group_name, handle, after)
@@ -99,12 +99,12 @@ JOIN STUDENT s     ON s.email = v.handle || '@scholarmesh.test';
 INSERT INTO BOOKMARK (student_id, doc_id, bookmarked_at)
 SELECT s.student_id, d.doc_id, CURRENT_TIMESTAMP - v.age
 FROM (VALUES
-    ('ananya.rao',     'transformers-self-attention',  INTERVAL '20 days'), ('ananya.rao',     'bias-variance-regularization', INTERVAL '18 days'),
-    ('ananya.rao',     'acid-isolation-levels',        INTERVAL '15 days'), ('ananya.rao',     'word-embeddings',              INTERVAL '12 days'),
-    ('ananya.rao',     'graph-traversals',             INTERVAL '9 days'),  ('ananya.rao',     'decision-trees-random-forests',INTERVAL '3 days'),
-    ('rahul.verma',    'normalization-1nf-bcnf',       INTERVAL '25 days'), ('rahul.verma',    'bplus-tree-hash-indexes',      INTERVAL '21 days'),
-    ('rahul.verma',    'dns-resolution',               INTERVAL '6 days'),  ('rahul.verma',    'cpu-scheduling',               INTERVAL '14 days'),
-    ('rahul.verma',    'dynamic-programming-patterns', INTERVAL '10 days'),
+    ('darshan.pawar',     'transformers-self-attention',  INTERVAL '20 days'), ('darshan.pawar',     'bias-variance-regularization', INTERVAL '18 days'),
+    ('darshan.pawar',     'acid-isolation-levels',        INTERVAL '15 days'), ('darshan.pawar',     'word-embeddings',              INTERVAL '12 days'),
+    ('darshan.pawar',     'graph-traversals',             INTERVAL '9 days'),  ('darshan.pawar',     'decision-trees-random-forests',INTERVAL '3 days'),
+    ('dhanush.biradar',    'normalization-1nf-bcnf',       INTERVAL '25 days'), ('dhanush.biradar',    'bplus-tree-hash-indexes',      INTERVAL '21 days'),
+    ('dhanush.biradar',    'dns-resolution',               INTERVAL '6 days'),  ('dhanush.biradar',    'cpu-scheduling',               INTERVAL '14 days'),
+    ('dhanush.biradar',    'dynamic-programming-patterns', INTERVAL '10 days'),
     ('priya.nair',     'transformers-self-attention',  INTERVAL '19 days'), ('priya.nair',     'bias-variance-regularization', INTERVAL '16 days'),
     ('priya.nair',     'precision-recall-roc',         INTERVAL '11 days'), ('priya.nair',     'svd-pca',                      INTERVAL '8 days'),
     ('priya.nair',     'backpropagation',              INTERVAL '2 days'),
@@ -144,15 +144,15 @@ WHERE fn_can_view_document(s.student_id, d.doc_id);
 INSERT INTO SEARCH_LOG (query_text, student_id, search_mode, result_count, searched_at)
 SELECT v.query_text, s.student_id, v.mode, v.result_count, CURRENT_TIMESTAMP - v.age
 FROM (VALUES
-    ('how does attention work in transformers'::varchar, 'ananya.rao'::varchar,    'hybrid'::varchar,   6, INTERVAL '29 days 3 hours'),
-    ('difference between 3nf and bcnf',                 'ananya.rao',              'keyword',  3, INTERVAL '27 days 5 hours'),
-    ('why do gradients vanish in deep networks',        'ananya.rao',              'semantic', 5, INTERVAL '12 days 2 hours'),
-    ('kernel trick intuition',                          'ananya.rao',              'hybrid',   4, INTERVAL '6 days 1 hour'),
-    ('how do models focus on the important words',      'ananya.rao',              'semantic', 5, INTERVAL '2 days 4 hours'),
-    ('difference between 3nf and bcnf',                 'rahul.verma',             'hybrid',   4, INTERVAL '28 days 1 hour'),
-    ('tcp congestion window',                           'rahul.verma',             'keyword',  2, INTERVAL '22 days 6 hours'),
-    ('isolation levels phantom read',                   'rahul.verma',             'hybrid',   3, INTERVAL '15 days 3 hours'),
-    ('round robin time quantum',                        'rahul.verma',             'keyword',  2, INTERVAL '4 days 7 hours'),
+    ('how does attention work in transformers'::varchar, 'darshan.pawar'::varchar,    'hybrid'::varchar,   6, INTERVAL '29 days 3 hours'),
+    ('difference between 3nf and bcnf',                 'darshan.pawar',              'keyword',  3, INTERVAL '27 days 5 hours'),
+    ('why do gradients vanish in deep networks',        'darshan.pawar',              'semantic', 5, INTERVAL '12 days 2 hours'),
+    ('kernel trick intuition',                          'darshan.pawar',              'hybrid',   4, INTERVAL '6 days 1 hour'),
+    ('how do models focus on the important words',      'darshan.pawar',              'semantic', 5, INTERVAL '2 days 4 hours'),
+    ('difference between 3nf and bcnf',                 'dhanush.biradar',             'hybrid',   4, INTERVAL '28 days 1 hour'),
+    ('tcp congestion window',                           'dhanush.biradar',             'keyword',  2, INTERVAL '22 days 6 hours'),
+    ('isolation levels phantom read',                   'dhanush.biradar',             'hybrid',   3, INTERVAL '15 days 3 hours'),
+    ('round robin time quantum',                        'dhanush.biradar',             'keyword',  2, INTERVAL '4 days 7 hours'),
     ('regularization to stop overfitting',              'priya.nair',              'semantic', 5, INTERVAL '26 days 2 hours'),
     ('how does attention work in transformers',         'priya.nair',              'hybrid',   6, INTERVAL '19 days 8 hours'),
     ('pca vs svd',                                      'priya.nair',              'keyword',  2, INTERVAL '10 days 1 hour'),
