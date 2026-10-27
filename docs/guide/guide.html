@@ -24,6 +24,7 @@
   tr { break-inside: avoid; }
   .lead { font-size: 12pt; color: #334155; }
   .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; margin: 10px 0; break-inside: avoid; }
+  .small-note { font-size: 9.6pt; color: #92400e; background: #fffbeb; border-radius: 6px; padding: 5px 9px; }
   .tip { background: #ecfdf5; border-left: 4px solid #10b981; padding: 8px 12px; border-radius: 6px; margin: 10px 0; break-inside: avoid; }
   .warn { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 8px 12px; border-radius: 6px; margin: 10px 0; break-inside: avoid; }
   .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
@@ -257,6 +258,8 @@ cd DBMS-Mini-Project</pre></div></div>
 <div class="step"><div class="n">2</div><div>
 <h3>Start the database (Docker)</h3>
 <p>Open <b>Docker Desktop</b> first and wait until it says it is running. Then:</p>
+<p class="small-note"><b>Set it up before on this computer?</b> Skip the <code>cp</code> lines here and in step 3 — they would replace your
+existing settings, and the database still expects the old password.</p>
 <pre>cp .env.example .env           <span class="c"># database settings (example passwords are fine for local use)</span>
 docker compose up -d           <span class="c"># downloads and starts PostgreSQL + pgvector on port 5433</span></pre></div></div>
 
@@ -294,7 +297,8 @@ npm run db:embed               <span class="c"># AI model reads every note (firs
 <table>
   <tr><th style="width:40%">Problem</th><th>Fix</th></tr>
   <tr><td><code>docker</code> says it cannot connect</td><td>Docker Desktop is not running. Open it, wait a minute, try again.</td></tr>
-  <tr><td>"password authentication failed for user scholarmesh_app"</td><td>The app password in <code>web/.env.local</code> doesn't match <code>APP_DB_PASSWORD</code> in <code>.env</code>. Make them equal, then <code>npm run db:setup</code>.</td></tr>
+  <tr><td>"password authentication failed for user postgres"</td><td>The database was created earlier with another password (PostgreSQL keeps the first one), usually because <code>.env</code> was copied again. Put the old <code>.env</code> back, or start fresh — <b>this deletes the database data</b>: <code>docker compose down -v</code>, <code>docker compose up -d</code>, then steps 4–5.</td></tr>
+  <tr><td>"password authentication failed for user scholarmesh_app"</td><td>The app password in <code>web/.env.local</code> doesn't match <code>APP_DB_PASSWORD</code> in <code>.env</code>. Make them equal, then <code>npm run db:setup</code> (this also resets the demo data).</td></tr>
   <tr><td>Port 3000 or 5433 already in use</td><td>App: <code>npm run dev -- -p 3001</code>. Database: change <code>POSTGRES_PORT</code> in <code>.env</code> and the port in <code>DATABASE_URL</code>, then <code>docker compose up -d</code>.</td></tr>
   <tr><td>Semantic search finds nothing / notes show "Embedding…"</td><td>Run <code>npm run db:embed</code> (needs internet the first time to download the model).</td></tr>
   <tr><td>Want the original demo data back</td><td><code>npm run db:setup</code> then <code>npm run db:embed</code> (inside <code>web</code>).</td></tr>

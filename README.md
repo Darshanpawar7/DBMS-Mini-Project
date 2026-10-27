@@ -64,6 +64,8 @@ cd DBMS-Mini-Project
 
 ```bash
 # 1. Database settings (root folder). Pick your own passwords.
+#    Set up before on this computer? Skip both `cp` lines -- they replace your settings,
+#    and the existing database keeps its original password.
 cp .env.example .env
 
 # 2. Start PostgreSQL + pgvector on port 5433
