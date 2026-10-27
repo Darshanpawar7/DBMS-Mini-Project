@@ -21,7 +21,7 @@ describe("STUDENT constraints", () => {
 
   test("email uniqueness ignores case and whitespace (unique index + normalise trigger)", async () => {
     await inRolledBackTx(async (c) => {
-      const err = await attempt(c, "INSERT INTO STUDENT (full_name, email, password_hash) VALUES ('Copy Cat', '  ANANYA.Rao@ScholarMesh.test ', $1)", [VALID_HASH]);
+      const err = await attempt(c, "INSERT INTO STUDENT (full_name, email, password_hash) VALUES ('Copy Cat', '  DARSHAN.Pawar@ScholarMesh.test ', $1)", [VALID_HASH]);
       expect(err?.code).toBe("23505");
       expect(err?.constraint).toBe("uq_student_email_ci");
     });
@@ -29,8 +29,8 @@ describe("STUDENT constraints", () => {
 
   test("role and year_of_study are restricted", async () => {
     await inRolledBackTx(async (c) => {
-      expect((await attempt(c, "UPDATE STUDENT SET role = 'superuser' WHERE email = 'ananya.rao@scholarmesh.test'"))?.constraint).toBe("chk_student_role");
-      expect((await attempt(c, "UPDATE STUDENT SET year_of_study = 9 WHERE email = 'ananya.rao@scholarmesh.test'"))?.code).toBe("23514");
+      expect((await attempt(c, "UPDATE STUDENT SET role = 'superuser' WHERE email = 'darshan.pawar@scholarmesh.test'"))?.constraint).toBe("chk_student_role");
+      expect((await attempt(c, "UPDATE STUDENT SET year_of_study = 9 WHERE email = 'darshan.pawar@scholarmesh.test'"))?.code).toBe("23514");
     });
   });
 });
@@ -38,7 +38,7 @@ describe("STUDENT constraints", () => {
 describe("DOCUMENT constraints", () => {
   test("course-only visibility requires a course (chk_document_course_vis)", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const err = await attempt(c, "INSERT INTO DOCUMENT (title, file_path, file_type, visibility, content, student_id) VALUES ('Lonely', 'x.md', 'md', 'course', 'text', $1)", [me]);
       expect(err?.constraint).toBe("chk_document_course_vis");
     });
@@ -46,7 +46,7 @@ describe("DOCUMENT constraints", () => {
 
   test("file type and visibility are whitelisted", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const exe = await attempt(c, "INSERT INTO DOCUMENT (title, file_path, file_type, content, student_id) VALUES ('Virus', 'x.exe', 'exe', 'text', $1)", [me]);
       expect(exe?.constraint).toBe("chk_document_file_type");
       const vis = await attempt(c, "INSERT INTO DOCUMENT (title, file_path, file_type, visibility, content, student_id) VALUES ('Shared', 'x.md', 'md', 'world', 'text', $1)", [me]);
@@ -65,7 +65,7 @@ describe("DOCUMENT constraints", () => {
 describe("other tables", () => {
   test("semester format, duplicate enrollment, tag format, group size", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const os = await courseId(c, "UE23CS342A");
       const dbms = await courseId(c, "UE23CS351A");
       expect((await attempt(c, "INSERT INTO ENROLLMENT VALUES ($1, $2, 'Fall-2026')", [me, os]))?.constraint).toBe("chk_enrollment_semester");

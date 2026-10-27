@@ -12,9 +12,9 @@ import {
 
 describe("registerSchema", () => {
   test("accepts a valid student and normalises the email", () => {
-    const result = registerSchema.parse({ full_name: "  Ananya Rao ", email: " Ananya.Rao@Example.EDU ", password: "secret123" });
-    expect(result.full_name).toBe("Ananya Rao");
-    expect(result.email).toBe("ananya.rao@example.edu");
+    const result = registerSchema.parse({ full_name: "  Darshan P Pawar ", email: " Darshan.Pawar@Example.EDU ", password: "secret123" });
+    expect(result.full_name).toBe("Darshan P Pawar");
+    expect(result.email).toBe("darshan.pawar@example.edu");
     expect(result.program).toBeNull();
   });
 

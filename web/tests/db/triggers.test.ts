@@ -6,7 +6,7 @@ afterAll(() => pool.end());
 describe("document triggers", () => {
   test("T4 splits content into chunks and T3 marks the document pending", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const paragraph = "Indexes trade write speed for read speed. ".repeat(30);
       const id = await scalar<number>(
         c,
@@ -58,7 +58,7 @@ describe("document triggers", () => {
 describe("study-group triggers", () => {
   test("T6 makes the creator the group admin", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const gid = await scalar<number>(c, "INSERT INTO STUDY_GROUP (group_name, course_id, created_by) VALUES ('Trigger test', $1, $2) RETURNING group_id", [await courseId(c, "UE23CS352A"), me]);
       const members = await c.query("SELECT student_id, role FROM GROUP_MEMBERSHIP WHERE group_id = $1", [gid]);
       expect(members.rows).toEqual([{ student_id: me, role: "admin" }]);
@@ -131,7 +131,7 @@ describe("study-group triggers", () => {
 
   test("T10 dropping a course also leaves its study groups", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const gid = await groupId(c, "DP on Trees");
       await c.query("DELETE FROM ENROLLMENT WHERE student_id = $1 AND course_id = $2", [me, await courseId(c, "UE23CS343A")]);
       expect(await scalar<number>(c, "SELECT COUNT(*)::INT FROM GROUP_MEMBERSHIP WHERE group_id = $1 AND student_id = $2", [gid, me])).toBe(0);

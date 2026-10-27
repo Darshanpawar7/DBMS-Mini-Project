@@ -6,10 +6,10 @@ afterAll(() => pool.end());
 describe("access control (fn_visible_doc_ids)", () => {
   test("another student's private note is invisible; your own is visible", async () => {
     await inRolledBackTx(async (c) => {
-      const ananya = await studentId(c, "ananya.rao");
+      const darshan = await studentId(c, "darshan.pawar");
       const kavya = await studentId(c, "kavya.menon");
       const privateNote = await docId(c, "kmeans-clustering"); // Kavya's private note
-      expect(await scalar(c, "SELECT fn_can_view_document($1, $2)", [ananya, privateNote])).toBe(false);
+      expect(await scalar(c, "SELECT fn_can_view_document($1, $2)", [darshan, privateNote])).toBe(false);
       expect(await scalar(c, "SELECT fn_can_view_document($1, $2)", [kavya, privateNote])).toBe(true);
     });
   });
@@ -17,8 +17,8 @@ describe("access control (fn_visible_doc_ids)", () => {
   test("course-only notes are visible to enrolled students only", async () => {
     await inRolledBackTx(async (c) => {
       const routing = await docId(c, "routing-algorithms"); // course-only, Computer Networks
-      expect(await scalar(c, "SELECT fn_can_view_document($1, $2)", [await studentId(c, "rahul.verma"), routing])).toBe(true); // enrolled
-      expect(await scalar(c, "SELECT fn_can_view_document($1, $2)", [await studentId(c, "ananya.rao"), routing])).toBe(false); // not enrolled
+      expect(await scalar(c, "SELECT fn_can_view_document($1, $2)", [await studentId(c, "dhanush.biradar"), routing])).toBe(true); // enrolled
+      expect(await scalar(c, "SELECT fn_can_view_document($1, $2)", [await studentId(c, "darshan.pawar"), routing])).toBe(false); // not enrolled
     });
   });
 
@@ -32,11 +32,11 @@ describe("access control (fn_visible_doc_ids)", () => {
 
   test("search never returns a document the student cannot see", async () => {
     await inRolledBackTx(async (c) => {
-      const ananya = await studentId(c, "ananya.rao");
+      const darshan = await studentId(c, "darshan.pawar");
       // use the private note's own embedding as the query: the perfect match must still be hidden
       const vec = await scalar<string>(c, "SELECT embedding::TEXT FROM DOC_CHUNK WHERE doc_id = $1 ORDER BY chunk_index LIMIT 1", [await docId(c, "kmeans-clustering")]);
-      const hits = await c.query("SELECT doc_id FROM fn_semantic_search($1, $2::vector, 20, 0.0)", [ananya, vec]);
-      const visible = await c.query("SELECT doc_id FROM fn_visible_doc_ids($1)", [ananya]);
+      const hits = await c.query("SELECT doc_id FROM fn_semantic_search($1, $2::vector, 20, 0.0)", [darshan, vec]);
+      const visible = await c.query("SELECT doc_id FROM fn_visible_doc_ids($1)", [darshan]);
       const allowed = new Set(visible.rows.map((r) => r.doc_id));
       expect(hits.rows.every((r) => allowed.has(r.doc_id))).toBe(true);
       expect(hits.rows.map((r) => r.doc_id)).not.toContain(await docId(c, "kmeans-clustering"));
@@ -47,7 +47,7 @@ describe("access control (fn_visible_doc_ids)", () => {
 describe("search functions", () => {
   test("keyword search finds exact terms and returns highlight markers", async () => {
     await inRolledBackTx(async (c) => {
-      const hits = await c.query("SELECT doc_id, snippet FROM fn_keyword_search($1, 'BCNF', 5)", [await studentId(c, "ananya.rao")]);
+      const hits = await c.query("SELECT doc_id, snippet FROM fn_keyword_search($1, 'BCNF', 5)", [await studentId(c, "darshan.pawar")]);
       expect(hits.rows[0].doc_id).toBe(await docId(c, "normalization-1nf-bcnf"));
       expect(hits.rows[0].snippet).toContain("⟦");
     });
@@ -57,7 +57,7 @@ describe("search functions", () => {
     await inRolledBackTx(async (c) => {
       const target = await docId(c, "transformers-self-attention");
       const vec = await scalar<string>(c, "SELECT embedding::TEXT FROM DOC_CHUNK WHERE doc_id = $1 ORDER BY chunk_index LIMIT 1", [target]);
-      const hits = await c.query("SELECT doc_id, similarity FROM fn_semantic_search($1, $2::vector, 3)", [await studentId(c, "ananya.rao"), vec]);
+      const hits = await c.query("SELECT doc_id, similarity FROM fn_semantic_search($1, $2::vector, 3)", [await studentId(c, "darshan.pawar"), vec]);
       expect(hits.rows[0].doc_id).toBe(target);
       expect(hits.rows[0].similarity).toBeGreaterThan(0.99);
     });
@@ -67,7 +67,7 @@ describe("search functions", () => {
     await inRolledBackTx(async (c) => {
       const target = await docId(c, "normalization-1nf-bcnf");
       const vec = await scalar<string>(c, "SELECT embedding::TEXT FROM DOC_CHUNK WHERE doc_id = $1 ORDER BY chunk_index LIMIT 1", [target]);
-      const hits = await c.query("SELECT doc_id, keyword_rank, semantic_rank, score FROM fn_hybrid_search($1, 'BCNF', $2::vector, 5)", [await studentId(c, "ananya.rao"), vec]);
+      const hits = await c.query("SELECT doc_id, keyword_rank, semantic_rank, score FROM fn_hybrid_search($1, 'BCNF', $2::vector, 5)", [await studentId(c, "darshan.pawar"), vec]);
       expect(hits.rows[0]).toMatchObject({ doc_id: target, keyword_rank: 1, semantic_rank: 1 });
       expect(hits.rows[0].score).toBeCloseTo(2 / 61, 5);
     });
@@ -75,7 +75,7 @@ describe("search functions", () => {
 
   test("course and tag filters narrow every search", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const os = await courseId(c, "UE23CS342A");
       const hits = await c.query("SELECT d.course_id FROM fn_keyword_search($1, 'deadlock', 10, $2) k JOIN DOCUMENT d USING (doc_id)", [me, os]);
       expect(hits.rows.every((r) => r.course_id === os)).toBe(true);
@@ -95,7 +95,7 @@ describe("search functions", () => {
 describe("recommendations", () => {
   test("only open groups in the student's courses that they have not joined", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const recs = await c.query("SELECT group_id, seats_left, similarity, match_score FROM fn_recommend_groups($1, 10)", [me]);
       const mine = await c.query("SELECT group_id FROM GROUP_MEMBERSHIP WHERE student_id = $1", [me]);
       const myGroups = new Set(mine.rows.map((r) => r.group_id));
@@ -114,11 +114,11 @@ describe("recommendations", () => {
 
   test("private notes never shape what other students are shown", async () => {
     await inRolledBackTx(async (c) => {
-      const ananya = await studentId(c, "ananya.rao");
+      const darshan = await studentId(c, "darshan.pawar");
       const meera = await studentId(c, "meera.pillai"); // member of "Attention Is All We Need"
       const dl = await courseId(c, "UE23CS353A");
-      // Ananya has a public DL note tagged #secret-topic; Meera has only a PRIVATE one
-      for (const [owner, visibility] of [[ananya, "public"], [meera, "private"]] as const) {
+      // Darshan has a public DL note tagged #secret-topic; Meera has only a PRIVATE one
+      for (const [owner, visibility] of [[darshan, "public"], [meera, "private"]] as const) {
         const doc = await scalar<number>(
           c,
           "INSERT INTO DOCUMENT (title, file_path, file_type, visibility, content, student_id, course_id) VALUES ('Probe note', 'p.md', 'md', $1, 'probe text', $2, $3) RETURNING doc_id",
@@ -127,14 +127,14 @@ describe("recommendations", () => {
         await c.query("INSERT INTO TAG (tag_name) VALUES ('secret-topic') ON CONFLICT DO NOTHING");
         await c.query("INSERT INTO DOCUMENT_TAG SELECT $1, tag_id FROM TAG WHERE tag_name = 'secret-topic'", [doc]);
       }
-      const recs = await c.query("SELECT shared_tags FROM fn_recommend_groups($1, 10)", [ananya]);
+      const recs = await c.query("SELECT shared_tags FROM fn_recommend_groups($1, 10)", [darshan]);
       expect(recs.rows.flatMap((r) => r.shared_tags)).not.toContain("secret-topic");
     });
   });
 
   test("study partners share at least one course", async () => {
     await inRolledBackTx(async (c) => {
-      const rows = await c.query("SELECT shared_courses FROM fn_recommend_partners($1, 10)", [await studentId(c, "ananya.rao")]);
+      const rows = await c.query("SELECT shared_courses FROM fn_recommend_partners($1, 10)", [await studentId(c, "darshan.pawar")]);
       expect(rows.rows.every((r) => r.shared_courses.length > 0)).toBe(true);
     });
   });
@@ -143,7 +143,7 @@ describe("recommendations", () => {
 describe("stored procedures", () => {
   test("sp_join_group adds a member and rejects a duplicate (SM409)", async () => {
     await inRolledBackTx(async (c) => {
-      const me = await studentId(c, "ananya.rao");
+      const me = await studentId(c, "darshan.pawar");
       const gid = await groupId(c, "Gradient Descenders");
       await c.query("CALL sp_join_group($1, $2)", [me, gid]);
       expect(await scalar(c, "SELECT role FROM GROUP_MEMBERSHIP WHERE group_id = $1 AND student_id = $2", [gid, me])).toBe("member");

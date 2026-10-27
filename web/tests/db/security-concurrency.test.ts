@@ -30,7 +30,7 @@ describe("transactions", () => {
   test("a failing statement rolls back the whole unit of work", async () => {
     const client = await pool.connect();
     try {
-      const me = await scalar<number>(client, "SELECT student_id FROM STUDENT WHERE email = 'ananya.rao@scholarmesh.test'");
+      const me = await scalar<number>(client, "SELECT student_id FROM STUDENT WHERE email = 'darshan.pawar@scholarmesh.test'");
       const before = await scalar<number>(client, "SELECT COUNT(*)::INT FROM DOCUMENT");
       await client.query("BEGIN");
       await client.query("INSERT INTO DOCUMENT (title, file_path, file_type, content, student_id) VALUES ('Half saved', 'h.md', 'md', 'some text', $1)", [me]);

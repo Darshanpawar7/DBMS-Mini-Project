@@ -15,7 +15,7 @@ test("anonymous visitors are sent to the login page", async ({ page }) => {
 });
 
 test("wrong password shows an error", async ({ page }) => {
-  await logIn(page, "ananya.rao@scholarmesh.test", "wrong-password1");
+  await logIn(page, "darshan.pawar@scholarmesh.test", "wrong-password1");
   // (Next.js adds its own hidden route-announcer alert, so match ours by text)
   await expect(page.getByRole("alert").filter({ hasText: "Incorrect email or password" })).toBeVisible();
 });
@@ -25,7 +25,7 @@ test.describe.serial("student journey", () => {
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    await logIn(page, "ananya.rao@scholarmesh.test", "Scholar@123");
+    await logIn(page, "darshan.pawar@scholarmesh.test", "Scholar@123");
     await expect(page).toHaveURL(/\/dashboard/);
   });
 
@@ -34,7 +34,7 @@ test.describe.serial("student journey", () => {
   });
 
   test("dashboard shows stats, feed and recommendations", async () => {
-    await expect(page.getByRole("heading", { name: "Good to see you, Ananya." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Good to see you, Darshan." })).toBeVisible();
     await expect(page.getByText("Groups for you")).toBeVisible();
     await expect(page.getByText("New in your courses")).toBeVisible();
   });
