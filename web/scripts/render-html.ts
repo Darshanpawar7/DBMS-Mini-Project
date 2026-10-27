@@ -1,13 +1,13 @@
 /**
  * Renders a local HTML/SVG file to PNG or PDF with headless Chromium (used for the report).
- *   npx tsx scripts/render-html.ts <input.html|svg> <output.png|pdf> [width] [height]
+ *   npx tsx scripts/render-html.ts <input.html|svg> <output.png|pdf> [width] [height] [footer label]
  */
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
 
 async function main(): Promise<void> {
-  const [input, output, width = "1300", height = "960"] = process.argv.slice(2);
+  const [input, output, width = "1300", height = "960", footer = "ScholarMesh · Phase 2"] = process.argv.slice(2);
   if (!input || !output) throw new Error("usage: render-html.ts <input> <output.png|pdf> [width] [height]");
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: Number(width), height: Number(height) }, deviceScaleFactor: 1 });
@@ -22,7 +22,7 @@ async function main(): Promise<void> {
       displayHeaderFooter: true,
       headerTemplate: "<span></span>",
       footerTemplate:
-        '<div style="width:100%;font-size:8px;color:#94a3b8;text-align:center;font-family:Arial">ScholarMesh · Phase 2 · Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>',
+        `<div style="width:100%;font-size:8px;color:#94a3b8;text-align:center;font-family:Arial">${footer} · Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>`,
     });
   } else {
     await page.screenshot({ path: output, fullPage: !input.endsWith(".svg") });
