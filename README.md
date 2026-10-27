@@ -86,11 +86,11 @@ npm run dev           # http://localhost:3000
 
 ### Demo accounts
 
-| Role | Email | Password |
+| Who | Email | Password |
 | --- | --- | --- |
+| Darshan P Pawar (student) | `darshan.pawar@scholarmesh.test` | `Scholar@123` |
+| Dhanush V Biradar (student) | `dhanush.biradar@scholarmesh.test` | `Scholar@123` |
 | Admin | `admin@scholarmesh.test` | `Admin@12345` |
-| Student | `ananya.rao@scholarmesh.test` | `Scholar@123` |
-| Student | any other seeded student, e.g. `rahul.verma@scholarmesh.test` | `Scholar@123` |
 
 Only bcrypt hashes are stored in the database; these demo passwords exist only in this README.
 

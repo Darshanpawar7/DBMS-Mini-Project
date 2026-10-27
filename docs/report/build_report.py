@@ -507,7 +507,8 @@ npm install
 npm run db:setup                     # schema, functions, triggers, grants, seed data
 npm run db:embed                     # compute embeddings (downloads the 23 MB model once)
 npm run dev                          # http://localhost:3000</pre>
-<p>Demo logins: <code>admin@scholarmesh.test / Admin@12345</code> (admin), <code>ananya.rao@scholarmesh.test / Scholar@123</code> (student).</p>
+<p>Demo logins: <code>darshan.pawar@scholarmesh.test</code> and <code>dhanush.biradar@scholarmesh.test</code> (students, password
+<code>Scholar@123</code>); <code>admin@scholarmesh.test / Admin@12345</code> (admin).</p>
 """
 
 CSS = """

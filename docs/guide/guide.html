@@ -276,11 +276,11 @@ npm run db:embed               <span class="c"># AI model reads every note (firs
 <pre>npm run dev</pre>
 <p>Open <b>http://localhost:3000</b> and log in:</p>
 <table>
-  <tr><th>Role</th><th>Email</th><th>Password</th></tr>
-  <tr><td>Student</td><td><code>ananya.rao@scholarmesh.test</code></td><td><code>Scholar@123</code></td></tr>
+  <tr><th>Who</th><th>Email</th><th>Password</th></tr>
+  <tr><td>Darshan P Pawar (student)</td><td><code>darshan.pawar@scholarmesh.test</code></td><td><code>Scholar@123</code></td></tr>
+  <tr><td>Dhanush V Biradar (student)</td><td><code>dhanush.biradar@scholarmesh.test</code></td><td><code>Scholar@123</code></td></tr>
   <tr><td>Admin</td><td><code>admin@scholarmesh.test</code></td><td><code>Admin@12345</code></td></tr>
 </table>
-<p>Every other demo student (e.g. <code>rahul.verma@scholarmesh.test</code>) also uses <code>Scholar@123</code>.</p>
 </div></div>
 
 <div class="tip"><b>Next time</b> you only need: open Docker Desktop → in the project folder run <code>docker compose up -d</code> → then
@@ -294,7 +294,6 @@ npm run db:embed               <span class="c"># AI model reads every note (firs
 <table>
   <tr><th style="width:40%">Problem</th><th>Fix</th></tr>
   <tr><td><code>docker</code> says it cannot connect</td><td>Docker Desktop is not running. Open it, wait a minute, try again.</td></tr>
-  <tr><td>The first <code>npm run dev</code> stops with a "Next.js security" message</td><td>Just run <code>npm run dev</code> again — it only shows the notice once.</td></tr>
   <tr><td>"password authentication failed for user scholarmesh_app"</td><td>The app password in <code>web/.env.local</code> doesn't match <code>APP_DB_PASSWORD</code> in <code>.env</code>. Make them equal, then <code>npm run db:setup</code>.</td></tr>
   <tr><td>Port 3000 or 5433 already in use</td><td>App: <code>npm run dev -- -p 3001</code>. Database: change <code>POSTGRES_PORT</code> in <code>.env</code> and the port in <code>DATABASE_URL</code>, then <code>docker compose up -d</code>.</td></tr>
   <tr><td>Semantic search finds nothing / notes show "Embedding…"</td><td>Run <code>npm run db:embed</code> (needs internet the first time to download the model).</td></tr>
@@ -321,7 +320,7 @@ npm run db:embed               <span class="c"># AI model reads every note (firs
   <tr><td><code>docs/</code></td><td>Technical report (PDF), this guide, diagrams, screenshots</td></tr>
   <tr><td><code>docker-compose.yml</code>, <code>.env.example</code></td><td>Database container and settings templates</td></tr>
 </table>
-<div class="tip"><b>A 2-minute demo:</b> log in as Ananya → Search <i>"bcnf decomposition"</i> in Keyword mode (0 results), then Semantic mode (finds the note) →
+<div class="tip"><b>A 2-minute demo:</b> log in as Darshan → Search <i>"bcnf decomposition"</i> in Keyword mode (0 results), then Semantic mode (finds the note) →
 Study groups → open <i>Query Optimizers</i> → Join (the database refuses: group full) → log out, log in as admin → show the charts and the audit log.</div>
 
 </body>
