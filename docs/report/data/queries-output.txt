@@ -2,15 +2,15 @@ Pager usage is off.
 Border style is 2.
 
 === Q1  JOIN (4 tables) + ORDER BY: the 5 most-saved public notes with owner and course
-+--------------------------------------------+----------------+-------------+-------+
-|                   title                    |     owner      | course_code | saves |
-+--------------------------------------------+----------------+-------------+-------+
-| Transformers and Self-Attention Explained  | Sneha Kulkarni | UE23CS353A  |     6 |
-| Dynamic Programming Patterns               | Ananya Rao     | UE23CS343A  |     5 |
-| Bias-Variance Trade-off and Regularization | Meera Pillai   | UE23CS352A  |     4 |
-| Normalization from 1NF to BCNF             | Ananya Rao     | UE23CS351A  |     4 |
-| CPU Scheduling Algorithms Compared         | Vikram Reddy   | UE23CS342A  |     3 |
-+--------------------------------------------+----------------+-------------+-------+
++--------------------------------------------+-----------------+-------------+-------+
+|                   title                    |      owner      | course_code | saves |
++--------------------------------------------+-----------------+-------------+-------+
+| Transformers and Self-Attention Explained  | Sneha Kulkarni  | UE23CS353A  |     6 |
+| Dynamic Programming Patterns               | Darshan P Pawar | UE23CS343A  |     5 |
+| Bias-Variance Trade-off and Regularization | Meera Pillai    | UE23CS352A  |     4 |
+| Normalization from 1NF to BCNF             | Darshan P Pawar | UE23CS351A  |     4 |
+| CPU Scheduling Algorithms Compared         | Vikram Reddy    | UE23CS342A  |     3 |
++--------------------------------------------+-----------------+-------------+-------+
 (5 rows)
 
 
@@ -18,13 +18,13 @@ Border style is 2.
 +-------------+-------+-----------+--------------+-------------+
 | course_code | notes | avg_bytes | first_upload | last_upload |
 +-------------+-------+-----------+--------------+-------------+
-| UE23CS351A  |     6 |      1643 | 2026-09-02   | 2026-10-04  |
-| UE23CS352A  |     6 |      1550 | 2026-09-03   | 2026-10-07  |
-| UE23CS353A  |     5 |      1521 | 2026-09-12   | 2026-10-09  |
-| UE23CS342A  |     4 |      1614 | 2026-09-07   | 2026-10-02  |
-| UE23CS343A  |     4 |      1488 | 2026-09-09   | 2026-10-06  |
-| UE23CS341A  |     4 |      1670 | 2026-09-06   | 2026-10-05  |
-| UE23MA241B  |     3 |      1404 | 2026-09-11   | 2026-10-03  |
+| UE23CS352A  |     7 |    117329 | 2026-09-17   | 2026-10-27  |
+| UE23CS351A  |     6 |      1649 | 2026-09-16   | 2026-10-18  |
+| UE23CS353A  |     5 |      1528 | 2026-09-26   | 2026-10-23  |
+| UE23CS342A  |     4 |      1621 | 2026-09-21   | 2026-10-16  |
+| UE23CS343A  |     4 |      1496 | 2026-09-23   | 2026-10-20  |
+| UE23CS341A  |     4 |      1677 | 2026-09-20   | 2026-10-19  |
+| UE23MA241B  |     3 |      1410 | 2026-09-25   | 2026-10-17  |
 +-------------+-------+-----------+--------------+-------------+
 (7 rows)
 
@@ -54,13 +54,13 @@ Border style is 2.
 
 
 === Q5  Scalar subquery in SELECT + CTE: each student vs the class average upload count
-+--------------+-------+-----------+
-|  full_name   | notes | class_avg |
-+--------------+-------+-----------+
-| Ananya Rao   |     4 |      2.06 |
-| Karthik Iyer |     3 |      2.06 |
-| Arjun Mehta  |     3 |      2.06 |
-+--------------+-------+-----------+
++-----------------+-------+-----------+
+|    full_name    | notes | class_avg |
++-----------------+-------+-----------+
+| Darshan P Pawar |     5 |      2.13 |
+| Karthik Iyer    |     3 |      2.13 |
+| Arjun Mehta     |     3 |      2.13 |
++-----------------+-------+-----------+
 (3 rows)
 
 
@@ -85,27 +85,27 @@ Border style is 2.
 +------------+----------+---------------+
 |    day     | searches | running_total |
 +------------+----------+---------------+
-| 2026-10-13 |        6 |            56 |
-| 2026-10-12 |        2 |            50 |
-| 2026-10-11 |        3 |            48 |
-| 2026-10-10 |        3 |            45 |
-| 2026-10-09 |        2 |            42 |
-| 2026-10-08 |        2 |            40 |
-| 2026-10-07 |        3 |            38 |
+| 2026-10-27 |       13 |            63 |
+| 2026-10-26 |        2 |            50 |
+| 2026-10-25 |        3 |            48 |
+| 2026-10-24 |        3 |            45 |
+| 2026-10-23 |        2 |            42 |
+| 2026-10-22 |        2 |            40 |
+| 2026-10-21 |        3 |            38 |
 +------------+----------+---------------+
 (7 rows)
 
 
 === Q8  Views: catalog view + group overview view
-+--------------------------------------------+----------------+-------------+---------------------------------------------------+----------------+-------------+
-|                   title                    |   owner_name   | course_code |                       tags                        | bookmark_count | chunk_count |
-+--------------------------------------------+----------------+-------------+---------------------------------------------------+----------------+-------------+
-| Transformers and Self-Attention Explained  | Sneha Kulkarni | UE23CS353A  | {attention,neural-networks,nlp,transformers}      |              6 |           3 |
-| Dynamic Programming Patterns               | Ananya Rao     | UE23CS343A  | {dynamic-programming,exam-prep}                   |              5 |           3 |
-| Bias-Variance Trade-off and Regularization | Meera Pillai   | UE23CS352A  | {exam-prep,overfitting,regularization}            |              4 |           3 |
-| Normalization from 1NF to BCNF             | Ananya Rao     | UE23CS351A  | {exam-prep,functional-dependencies,normalization} |              4 |           3 |
-| Transactions, ACID and Isolation Levels    | Rahul Verma    | UE23CS351A  | {concurrency,exam-prep,transactions}              |              3 |           3 |
-+--------------------------------------------+----------------+-------------+---------------------------------------------------+----------------+-------------+
++--------------------------------------------+-------------------+-------------+---------------------------------------------------+----------------+-------------+
+|                   title                    |    owner_name     | course_code |                       tags                        | bookmark_count | chunk_count |
++--------------------------------------------+-------------------+-------------+---------------------------------------------------+----------------+-------------+
+| Transformers and Self-Attention Explained  | Sneha Kulkarni    | UE23CS353A  | {attention,neural-networks,nlp,transformers}      |              6 |           3 |
+| Dynamic Programming Patterns               | Darshan P Pawar   | UE23CS343A  | {dynamic-programming,exam-prep}                   |              5 |           3 |
+| Normalization from 1NF to BCNF             | Darshan P Pawar   | UE23CS351A  | {exam-prep,functional-dependencies,normalization} |              4 |           3 |
+| Bias-Variance Trade-off and Regularization | Meera Pillai      | UE23CS352A  | {exam-prep,overfitting,regularization}            |              4 |           3 |
+| Transactions, ACID and Isolation Levels    | Dhanush V Biradar | UE23CS351A  | {concurrency,exam-prep,transactions}              |              3 |           3 |
++--------------------------------------------+-------------------+-------------+---------------------------------------------------+----------------+-------------+
 (5 rows)
 
 +--------------------------+-------------+--------------+-------------+------------+
@@ -127,14 +127,14 @@ Border style is 2.
 +-------------------------------+
 |         refreshed_at          |
 +-------------------------------+
-| 2026-10-13 08:43:51.873696+00 |
+| 2026-10-27 08:45:11.606218+00 |
 +-------------------------------+
 (1 row)
 
 +-------------+-------------------+-----------+-----------+--------------+---------------+
 | course_code | enrolled_students | documents | bookmarks | study_groups | group_members |
 +-------------+-------------------+-----------+-----------+--------------+---------------+
-| UE23CS352A  |                11 |         6 |        12 |            2 |             6 |
+| UE23CS352A  |                11 |         7 |        12 |            2 |             6 |
 | UE23CS351A  |                10 |         6 |        12 |            2 |             9 |
 | UE23CS353A  |                 8 |         5 |        13 |            1 |             4 |
 | UE23CS341A  |                 7 |         4 |         5 |            1 |             4 |
@@ -150,8 +150,8 @@ Border style is 2.
 +-------------------------------------------------------+-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 |                         title                         | rank  |                                                                                                                              snippet                                                                                                                              |
 +-------------------------------------------------------+-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Concurrency Control: Two-Phase Locking and Deadlocks  | 0.667 | abort, which prevents cascading rollbacks because nobody reads uncommitted data.                                                                                                                                                                                 +|
-|                                                       |       |                                                                                                                                                                                                                                                                  +|
+| Concurrency Control: Two-Phase Locking and Deadlocks  | 0.667 | abort, which prevents cascading rollbacks because nobody reads uncommitted data.\r                                                                                                                                                                               +|
+|                                                       |       | \r                                                                                                                                                                                                                                                               +|
 |                                                       |       | 2PL has a price: ⟦deadlock⟧. Example: T1 holds X on account A and requests B, while T2 holds … waiting for a lock held by T2. A cycle in the graph means ⟦deadlock⟧. The system then aborts a victim, usually the cheapest transaction to undo, and rolls it back |
 | Virtual Memory, Paging and Page Replacement           | 0.375 | valid bit; if the ⟦page⟧ is not in memory, the access causes a ⟦page⟧ ⟦fault⟧. The OS finds the ⟦page⟧ on disk, picks a free frame, loads it, updates                                                                                                             |
 | Semaphores, Mutexes and the Producer-Consumer Problem | 0.167 | then cannot get the mutex to remove an item, so neither can ever proceed: ⟦deadlock⟧. The rule is to wait on the counting semaphore first, then take the mutex                                                                                                    |
@@ -183,24 +183,24 @@ Border style is 2.
 (5 rows)
 
 
-=== Q13 Study-group matching and study partners for Ananya
+=== Q13 Study-group matching and study partners for Darshan
 +--------------------------+-------------+------------+------------+-----------------------------------------------------------------------------------------------+-------------+
 |        group_name        | course_code | seats_left | similarity |                                          shared_tags                                          | match_score |
 +--------------------------+-------------+------------+------------+-----------------------------------------------------------------------------------------------+-------------+
-| Attention Is All We Need | UE23CS353A  |          4 |      0.776 | {attention,backpropagation,gradient-descent,neural-networks,nlp,transformers,word-embeddings} |       0.753 |
-| Gradient Descenders      | UE23CS352A  |          3 |      0.752 | {classification,decision-trees,ensemble-learning,exam-prep,overfitting,regularization}        |       0.690 |
-| Kernel Trick Club        | UE23CS352A  |          2 |      0.669 | {classification,decision-trees,ensemble-learning}                                             |       0.568 |
+| Attention Is All We Need | UE23CS353A  |          4 |      0.695 | {attention,backpropagation,gradient-descent,neural-networks,nlp,transformers,word-embeddings} |       0.696 |
+| Gradient Descenders      | UE23CS352A  |          3 |      0.661 | {classification,decision-trees,ensemble-learning,exam-prep,overfitting,regularization}        |       0.613 |
+| Kernel Trick Club        | UE23CS352A  |          2 |      0.643 | {classification,decision-trees,ensemble-learning}                                             |       0.540 |
 +--------------------------+-------------+------------+------------+-----------------------------------------------------------------------------------------------+-------------+
 (3 rows)
 
 +----------------+----------------------------------------------------------+------------+
 |   full_name    |                      shared_courses                      | similarity |
 +----------------+----------------------------------------------------------+------------+
-| Meera Pillai   | {UE23CS343A,UE23CS351A,UE23CS352A,UE23CS353A,UE23MA241B} |      0.717 |
-| Siddharth Rao  | {UE23CS343A,UE23CS352A,UE23CS353A}                       |      0.713 |
-| Ishita Das     | {UE23CS351A,UE23CS352A,UE23CS353A}                       |      0.677 |
-| Sneha Kulkarni | {UE23CS352A,UE23CS353A,UE23MA241B}                       |      0.673 |
-| Priya Nair     | {UE23CS351A,UE23CS352A,UE23CS353A,UE23MA241B}            |      0.634 |
+| Siddharth Rao  | {UE23CS343A,UE23CS352A,UE23CS353A}                       |      0.644 |
+| Meera Pillai   | {UE23CS343A,UE23CS351A,UE23CS352A,UE23CS353A,UE23MA241B} |      0.634 |
+| Diya Shah      | {UE23CS343A,UE23CS351A,UE23CS352A}                       |      0.613 |
+| Ishita Das     | {UE23CS351A,UE23CS352A,UE23CS353A}                       |      0.599 |
+| Sneha Kulkarni | {UE23CS352A,UE23CS353A,UE23MA241B}                       |      0.584 |
 +----------------+----------------------------------------------------------+------------+
 (5 rows)
 
@@ -210,7 +210,7 @@ BEGIN
 +--------+---------------------+
 | tag_id |      tag_name       |
 +--------+---------------------+
-|     72 | write-ahead-logging |
+|     79 | write-ahead-logging |
 +--------+---------------------+
 (1 row)
 
@@ -226,7 +226,7 @@ UPDATE 1
 +--------+--------+
 | doc_id | tag_id |
 +--------+--------+
-|      5 |     72 |
+|      5 |     79 |
 +--------+--------+
 (1 row)
 
@@ -244,19 +244,19 @@ INSERT 0 1
 (6 rows)
 
 DELETE 6
-+----------------------------+
-| ananya_bookmarks_inside_tx |
-+----------------------------+
-|                          0 |
-+----------------------------+
++-----------------------------+
+| darshan_bookmarks_inside_tx |
++-----------------------------+
+|                           0 |
++-----------------------------+
 (1 row)
 
 ROLLBACK
-+---------------------------------+
-| ananya_bookmarks_after_rollback |
-+---------------------------------+
-|                               6 |
-+---------------------------------+
++----------------------------------+
+| darshan_bookmarks_after_rollback |
++----------------------------------+
+|                                6 |
++----------------------------------+
 (1 row)
 
 
