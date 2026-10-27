@@ -36,7 +36,7 @@ async function main(): Promise<void> {
   await page.goto(`${BASE}/login`);
   await shot(page, "02-login", false);
 
-  await logIn(page, "ananya.rao@scholarmesh.test", "Scholar@123");
+  await logIn(page, "darshan.pawar@scholarmesh.test", "Scholar@123");
   await shot(page, "03-student-dashboard");
 
   await page.goto(`${BASE}/search?q=${encodeURIComponent("how do models decide which words matter")}&mode=hybrid`);

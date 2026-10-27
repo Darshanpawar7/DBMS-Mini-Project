@@ -51,7 +51,7 @@ export default async function LandingPage() {
             </LinkButton>
           </div>
           <p className="mt-6 text-sm text-muted">
-            Demo: <code className="rounded bg-white px-1.5 py-0.5 text-ink">ananya.rao@scholarmesh.test</code> /{" "}
+            Demo: <code className="rounded bg-white px-1.5 py-0.5 text-ink">darshan.pawar@scholarmesh.test</code> /{" "}
             <code className="rounded bg-white px-1.5 py-0.5 text-ink">Scholar@123</code>
           </p>
         </section>
