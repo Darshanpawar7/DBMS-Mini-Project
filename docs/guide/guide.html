@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ScholarMesh — Project Guide</title>
+<style>
+  @page { size: A4; }
+  @page wide { size: A4 landscape; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Inter, Arial, sans-serif; color: #0f172a; font-size: 10.5pt; line-height: 1.55; margin: 0; }
+  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: #1e1b4b; line-height: 1.25; }
+  h2 { font-size: 18pt; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid #c7d2fe; break-before: page; }
+  h2.same-page { break-before: auto; margin-top: 24px; }
+  h3 { font-size: 12.5pt; margin: 16px 0 6px; }
+  p, li { margin: 4px 0; }
+  ul, ol { padding-left: 20px; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 9pt; background: #f1f5f9; padding: 0 4px; border-radius: 3px; }
+  pre { font-family: Consolas, "Cascadia Mono", monospace; font-size: 9pt; line-height: 1.45; background: #0f172a; color: #e2e8f0;
+        padding: 9px 12px; border-radius: 8px; margin: 6px 0 10px; white-space: pre-wrap; break-inside: avoid; }
+  pre .c { color: #94a3b8; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 9.6pt; }
+  th, td { border: 1px solid #e2e8f0; padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: #eef2ff; color: #312e81; font-weight: 600; }
+  tr { break-inside: avoid; }
+  .lead { font-size: 12pt; color: #334155; }
+  .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; margin: 10px 0; break-inside: avoid; }
+  .tip { background: #ecfdf5; border-left: 4px solid #10b981; padding: 8px 12px; border-radius: 6px; margin: 10px 0; break-inside: avoid; }
+  .warn { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 8px 12px; border-radius: 6px; margin: 10px 0; break-inside: avoid; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+  .grid3 > div { background: #eef2ff; border-radius: 10px; padding: 10px 12px; }
+  .grid3 b { display: block; font-family: Georgia, serif; color: #312e81; font-size: 11.5pt; margin-bottom: 2px; }
+  .step { display: grid; grid-template-columns: 30px 1fr; gap: 10px; margin: 12px 0; break-inside: avoid; }
+  .step .n { width: 28px; height: 28px; border-radius: 50%; background: #4f46e5; color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .step h3 { margin: 2px 0 4px; }
+  figure { margin: 8px 0 14px; break-inside: avoid; text-align: center; }
+  figure img { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; }
+  figure img.crop { height: 102mm; object-fit: cover; object-position: top; }
+  figure img.crop-sm { height: 86mm; object-fit: cover; object-position: top; }
+  figcaption { font-size: 9pt; color: #475569; margin-top: 4px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pair figure img { height: 78mm; object-fit: cover; object-position: top; }
+  .phone { display: grid; grid-template-columns: 56mm 1fr; gap: 14px; align-items: center; }
+  .phone img { height: 100mm; object-fit: cover; object-position: top; }
+  .landscape { page: wide; }
+  .landscape svg { width: 100%; height: auto; max-height: 165mm; }
+  .cover { height: 255mm; display: flex; flex-direction: column; justify-content: center; }
+  .cover .kicker { text-transform: uppercase; letter-spacing: .14em; color: #4f46e5; font-weight: 700; font-size: 10pt; }
+  .cover h1 { font-size: 44pt; margin: 4px 0 0; color: #312e81; }
+  .cover .sub { font-family: Georgia, serif; font-size: 15pt; color: #334155; margin: 6px 0 22px; }
+  .meta td { border: none; border-bottom: 1px solid #e2e8f0; padding: 6px 0; }
+  .meta th { border: none; background: none; color: #64748b; width: 30mm; padding: 6px 0; }
+  .flow { width: 100%; height: auto; margin: 6px 0 4px; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ COVER -->
+<section class="cover">
+  <p class="kicker">DBMS Mini Project · Project Guide</p>
+  <h1>ScholarMesh</h1>
+  <p class="sub">Find study notes by meaning — and the classmates studying the same ideas.</p>
+  <table class="meta">
+    <tr><th>Team</th><td>Darshan P Pawar (PES2UG24CS143) · Dhanush V Biradar (PES2UG24CS155)</td></tr>
+    <tr><th>College</th><td>PES University, Electronic City Campus · Dept. of CSE</td></tr>
+    <tr><th>Code</th><td>github.com/Darshanpawar7/DBMS-Mini-Project</td></tr>
+    <tr><th>This guide</th><td>What the project is · tech stack · how it works · screenshots · how to run it on your computer</td></tr>
+  </table>
+  <div class="tip" style="margin-top:22px"><b>Short on time?</b> Read page 2 (what it is), the stack on page 3, and the 5 setup steps in section 5.
+  The full technical report is <code>docs/ScholarMesh_Phase2_Report.pdf</code>.</div>
+</section>
+
+<!-- ============================================================ 1. WHAT -->
+<h2>1. What is ScholarMesh?</h2>
+<p class="lead">A website where students upload their study notes, search them <b>by meaning</b> (not just exact words), and get
+<b>matched into study groups</b> with classmates who study the same topics.</p>
+
+<h3>The problem</h3>
+<ul>
+  <li>Notes are scattered across Drive folders, WhatsApp groups and laptops.</li>
+  <li>Normal search only finds <b>exact words</b>. Searching <i>"how do models decide which words matter"</i> finds nothing, even though a note called
+      <i>"Transformers and Self-Attention"</i> explains exactly that.</li>
+  <li>Finding study partners is random — you ask around in class groups.</li>
+</ul>
+
+<h3>What ScholarMesh does</h3>
+<div class="grid3">
+  <div><b>Search by meaning</b>Ask in your own words. The app understands what you mean and finds the right notes, even with no matching words.</div>
+  <div><b>Smart study groups</b>Suggests groups and classmates whose interests are closest to yours. Seat limits are enforced.</div>
+  <div><b>Safe sharing</b>Each note is <i>public</i>, <i>course-only</i> or <i>private</i>. Nobody ever sees a note they are not allowed to.</div>
+</div>
+
+<h3>Who uses it</h3>
+<table>
+  <tr><th style="width:24%">Role</th><th>What they can do</th></tr>
+  <tr><td><b>Student</b></td><td>Upload notes, search, save (bookmark) notes, enroll in courses, create / join / leave study groups, see their dashboard.</td></tr>
+  <tr><td><b>Group admin</b></td><td>A student who created or runs a group: edit the group, promote or remove members.</td></tr>
+  <tr><td><b>Admin</b></td><td>Platform manager: usage charts, manage users and roles, manage courses and tags, read the audit log.</td></tr>
+</table>
+
+<h3>Why it counts as a DBMS project (not just a CRUD app)</h3>
+<ul>
+  <li><b>Two kinds of database in one:</b> normal tables (SQL) for users, courses and groups, plus a <b>vector store</b> (pgvector) for the meaning of notes.</li>
+  <li><b>The database enforces the rules itself</b> using triggers, constraints and transactions — e.g. a full group can never accept another member,
+      even if two students click "Join" at the same moment.</li>
+  <li>Uses views, a materialized view, stored functions and procedures, indexes, full-text search, vector search and an audit log.</li>
+</ul>
+
+<!-- ============================================================ 2. STACK -->
+<h2>2. Tech stack</h2>
+<table>
+  <tr><th style="width:21%">Part</th><th style="width:27%">Technology</th><th>What it does here (in simple words)</th></tr>
+  <tr><td>Database</td><td><b>PostgreSQL 17</b></td><td>Stores everything: users, courses, notes, groups, bookmarks, searches. Checks every rule.</td></tr>
+  <tr><td>Vector search</td><td><b>pgvector</b> (PostgreSQL extension)</td><td>Stores each note passage as 384 numbers that capture its meaning, and finds the closest ones fast (HNSW index).</td></tr>
+  <tr><td>Keyword search</td><td>PostgreSQL <b>full-text search</b></td><td>Classic word search with word stems ("normalize" ≈ "normalization") and ranking (GIN index).</td></tr>
+  <tr><td>AI model</td><td><b>all-MiniLM-L6-v2</b> via Transformers.js</td><td>Turns text into those 384 numbers ("embeddings"). Runs on your own computer — no API key, no cost.</td></tr>
+  <tr><td>Website + API</td><td><b>Next.js 16</b>, React 19, TypeScript</td><td>The pages you see and the backend API they call. The browser never talks to the database directly.</td></tr>
+  <tr><td>Styling</td><td><b>Tailwind CSS 4</b></td><td>The look and layout, including phone screens.</td></tr>
+  <tr><td>Login &amp; security</td><td>bcrypt, signed JWT cookie, zod</td><td>Passwords stored only as hashes; a secure login cookie; every input checked.</td></tr>
+  <tr><td>Runs in</td><td><b>Docker</b> (Docker Compose)</td><td>Starts the database with one command — nothing to install for PostgreSQL itself.</td></tr>
+  <tr><td>Testing</td><td>Vitest, Playwright</td><td>101 automated tests: 91 code and database tests + 10 tests that click through the real website.</td></tr>
+  <tr><td>Version control</td><td>Git + GitHub</td><td>All code, history and documents.</td></tr>
+</table>
+
+<div class="box"><b>Why PostgreSQL + pgvector (Option 2) instead of a separate vector database?</b>
+Because the meaning-search and the "who may see this note?" check run <b>in the same SQL query</b>, a private note can never leak into
+results. Foreign keys also keep the vectors in sync with the notes — delete a note and its vectors disappear in the same transaction.</div>
+
+<!-- ============================================================ 3. HOW -->
+<h2>3. How it works</h2>
+<h3>The big picture</h3>
+<svg class="flow" viewBox="0 0 900 170" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial" font-size="13">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect x="10" y="40" width="170" height="90" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="95" y="76" text-anchor="middle" font-weight="700" fill="#0f172a">Your browser</text>
+  <text x="95" y="98" text-anchor="middle" fill="#475569" font-size="11.5">pages, forms, search box</text>
+  <rect x="250" y="20" width="300" height="130" rx="12" fill="#eef2ff" stroke="#a5b4fc"/>
+  <text x="400" y="48" text-anchor="middle" font-weight="700" fill="#312e81">Next.js server</text>
+  <text x="400" y="72" text-anchor="middle" fill="#334155" font-size="11.5">checks your login and role</text>
+  <text x="400" y="92" text-anchor="middle" fill="#334155" font-size="11.5">validates input · runs safe SQL</text>
+  <rect x="300" y="104" width="200" height="34" rx="8" fill="white" stroke="#a5b4fc"/>
+  <text x="400" y="126" text-anchor="middle" fill="#312e81" font-size="11.5">AI model: text → 384 numbers</text>
+  <rect x="620" y="20" width="270" height="130" rx="12" fill="#ecfdf5" stroke="#6ee7b7"/>
+  <text x="755" y="48" text-anchor="middle" font-weight="700" fill="#065f46">PostgreSQL + pgvector</text>
+  <text x="755" y="72" text-anchor="middle" fill="#334155" font-size="11.5">tables · vectors · indexes</text>
+  <text x="755" y="92" text-anchor="middle" fill="#334155" font-size="11.5">triggers, functions, views</text>
+  <text x="755" y="112" text-anchor="middle" fill="#334155" font-size="11.5">(runs in Docker)</text>
+  <line x1="182" y1="85" x2="248" y2="85" stroke="#475569" stroke-width="2" marker-end="url(#a)" marker-start="url(#a)"/>
+  <line x1="552" y1="85" x2="618" y2="85" stroke="#475569" stroke-width="2" marker-end="url(#a)" marker-start="url(#a)"/>
+  <text x="215" y="76" text-anchor="middle" fill="#475569" font-size="10.5">API</text>
+  <text x="585" y="76" text-anchor="middle" fill="#475569" font-size="10.5">SQL</text>
+</svg>
+
+<h3>The journey of a note</h3>
+<ol>
+  <li><b>Upload</b> — a PDF, TXT or Markdown file (or pasted text). The server pulls out the text.</li>
+  <li><b>Save</b> — in one <b>transaction</b>: the note is saved, and a database <b>trigger</b> splits the text into short passages (≤ 800 characters).
+      If anything fails, nothing is saved.</li>
+  <li><b>Understand</b> — the AI model turns every passage into 384 numbers (an <b>embedding</b>). Passages with similar meaning get similar numbers.</li>
+  <li><b>Find</b> — the note can now be found by its words and by its meaning.</li>
+</ol>
+
+<h3>The three search modes</h3>
+<table>
+  <tr><th style="width:18%">Mode</th><th>How it works</th><th style="width:30%">Think of it as…</th></tr>
+  <tr><td><b>Keyword</b></td><td>Matches the actual words (full-text search, GIN index), ranks by relevance, highlights matches.</td><td>Ctrl+F across all notes</td></tr>
+  <tr><td><b>Semantic</b></td><td>Turns your question into 384 numbers and finds the passages whose numbers are closest (cosine similarity, HNSW index).</td><td>A librarian who understands what you mean</td></tr>
+  <tr><td><b>Hybrid</b> (default)</td><td>Runs both and merges the two rankings (Reciprocal Rank Fusion), so exact words <i>and</i> meaning both count.</td><td>The best of both</td></tr>
+</table>
+
+<h3>Who can see which note</h3>
+<p><b>Public</b> → every logged-in user · <b>Course-only</b> → students enrolled in that course · <b>Private</b> → only the owner (and admins).
+One database function, <code>fn_visible_doc_ids</code>, makes this decision for every search, list, download and suggestion.</p>
+
+<h3>How study-group matching works</h3>
+<p>Each student gets an <b>interest vector</b>: the average meaning of the notes they uploaded or saved and the questions they searched. A group's interest is
+the average of its members'. Groups in your courses with a free seat are ranked by how close they are to you (70%) plus how many topic tags you
+share (30%). Classmates are ranked the same way.</p>
+
+<h3>Rules the database enforces by itself</h3>
+<ul>
+  <li>A group can't go over its seat limit — the group row is locked while someone joins, so two people can't take the last seat.</li>
+  <li>Only students enrolled in a course can create or join its groups. The creator automatically becomes group admin.</li>
+  <li>If the last admin leaves, the longest-standing member becomes admin; an empty group is deleted.</li>
+  <li>Dropping a course removes you from its groups. Deleting a course turns its course-only notes private.</li>
+  <li>Passwords must be bcrypt hashes (plain text is rejected). E-mails, tags and semesters must be in the right format.</li>
+  <li>Every important change (roles, notes, courses, groups) is written to an audit log with who did it.</li>
+</ul>
+
+<h3>The database at a glance — 12 tables</h3>
+<table>
+  <tr><th style="width:26%">Table</th><th>Stores</th></tr>
+  <tr><td>STUDENT</td><td>Users (students and admins), password hash, role, active or not</td></tr>
+  <tr><td>COURSE</td><td>Courses, e.g. UE23CS351A Database Management Systems</td></tr>
+  <tr><td>ENROLLMENT</td><td>Which student takes which course in which semester (many-to-many)</td></tr>
+  <tr><td>DOCUMENT</td><td>Notes: title, text, file, visibility, owner, course</td></tr>
+  <tr><td>DOC_CHUNK</td><td>Passages of each note + their 384-number vectors (pgvector)</td></tr>
+  <tr><td>TAG / DOCUMENT_TAG</td><td>Topic labels and which notes have them</td></tr>
+  <tr><td>BOOKMARK</td><td>Notes each student saved</td></tr>
+  <tr><td>STUDY_GROUP / GROUP_MEMBERSHIP</td><td>Groups (per course, with a seat limit) and their members with roles</td></tr>
+  <tr><td>SEARCH_LOG</td><td>Every search (for history, analytics and interest profiles)</td></tr>
+  <tr><td>AUDIT_LOG</td><td>History of important changes (written only by triggers)</td></tr>
+</table>
+<p>The full ER diagram is on the next page. Column-by-column details are in the technical report (section 9).</p>
+
+<div class="landscape">
+<h3 style="margin-top:0">The ER diagram</h3>
+<figure><img src="../report/er-diagram.svg" alt="ER diagram" style="border:none;max-height:148mm;object-fit:contain"/><figcaption>Rectangles = tables (entities), diamonds = relationships, 1 / N / M = how many on each side, double line = must take part, double box = weak entity (a passage belongs to its note).</figcaption></figure>
+</div>
+
+<!-- ============================================================ 4. SCREENSHOTS -->
+<h2>4. Screenshots</h2>
+<figure><img class="crop" src="../screenshots/01-landing.png" alt="Home page"/><figcaption>Home page — what the app does, with a demo login.</figcaption></figure>
+<figure><img class="crop" src="../screenshots/03-student-dashboard.png" alt="Student dashboard"/><figcaption>Student dashboard — your numbers, new notes from your courses, suggested groups and classmates, trending topics.</figcaption></figure>
+
+<figure><img class="crop" src="../screenshots/04-search-hybrid.png" alt="Hybrid search"/><figcaption>Search by meaning — the question shares no words with the notes, yet the right notes come back with a match score.</figcaption></figure>
+<div class="pair">
+  <figure><img src="../screenshots/05-search-keyword-no-results.png" alt="Keyword search no results"/><figcaption>Keyword mode: "bcnf decomposition" → 0 results (no note contains "decomposition").</figcaption></figure>
+  <figure><img src="../screenshots/06-search-semantic.png" alt="Semantic search result"/><figcaption>Semantic mode: the same question finds the Normalization note by meaning.</figcaption></figure>
+</div>
+
+<figure><img class="crop" src="../screenshots/08-document-detail.png" alt="Note page"/><figcaption>A note — save it, download it, and see "more like this" (similar notes by meaning).</figcaption></figure>
+<figure><img class="crop" src="../screenshots/10-study-groups.png" alt="Study groups"/><figcaption>Study groups — best matches for you, your groups, and live seat counts.</figcaption></figure>
+
+<div class="pair">
+  <figure><img src="../screenshots/09-upload-form.png" alt="Upload form"/><figcaption>Uploading a note: file or pasted text, course, who can see it, tags.</figcaption></figure>
+  <figure><img src="../screenshots/11-group-full-trigger.png" alt="Group full"/><figcaption>Joining a full group — the database itself refuses: "4 of 4 seats taken".</figcaption></figure>
+</div>
+<figure><img class="crop" src="../screenshots/14-admin-overview.png" alt="Admin overview"/><figcaption>Admin dashboard — searches per day, notes per course, top contributors, popular questions and "content gaps" (questions with no notes yet).</figcaption></figure>
+
+<figure><img class="crop-sm" src="../screenshots/17-admin-audit-log.png" alt="Audit log"/><figcaption>Audit log — every important change, with who made it and when.</figcaption></figure>
+<div class="phone">
+  <figure><img src="../screenshots/13-mobile-dashboard.png" alt="Phone view"/></figure>
+  <div>
+    <h3>Works on phones too</h3>
+    <p>The layout adapts to small screens; the menu folds into a ☰ button.</p>
+    <h3>More screenshots</h3>
+    <p>All 17 screenshots (login, library, courses, admin users, courses &amp; tags …) are in <code>docs/screenshots/</code>.</p>
+  </div>
+</div>
+
+<!-- ============================================================ 5. SETUP -->
+<h2>5. Run it on your computer</h2>
+<div class="box"><b>Install these once</b> (all free):
+<ul style="margin:4px 0 0">
+  <li><b>Docker Desktop</b> — docker.com/products/docker-desktop (runs the database)</li>
+  <li><b>Node.js 20 or newer</b> (LTS) — nodejs.org (runs the website)</li>
+  <li><b>Git</b> — git-scm.com (downloads the code)</li>
+</ul>
+You also need internet the first time (downloads ~1 GB of packages/images and a 23 MB AI model).</div>
+<p>The commands below work in <b>PowerShell</b> (Windows) and in the <b>Terminal</b> on Mac/Linux.</p>
+
+<div class="step"><div class="n">1</div><div>
+<h3>Get the code</h3>
+<pre>git clone https://github.com/Darshanpawar7/DBMS-Mini-Project.git
+cd DBMS-Mini-Project</pre></div></div>
+
+<div class="step"><div class="n">2</div><div>
+<h3>Start the database (Docker)</h3>
+<p>Open <b>Docker Desktop</b> first and wait until it says it is running. Then:</p>
+<pre>cp .env.example .env           <span class="c"># database settings (example passwords are fine for local use)</span>
+docker compose up -d           <span class="c"># downloads and starts PostgreSQL + pgvector on port 5433</span></pre></div></div>
+
+<div class="step"><div class="n">3</div><div>
+<h3>Set up the website</h3>
+<pre>cd web
+cp .env.example .env.local     <span class="c"># app settings (already match the database settings)</span>
+npm install                    <span class="c"># installs packages (a few minutes the first time)</span></pre></div></div>
+
+<div class="step"><div class="n">4</div><div>
+<h3>Create the tables and load the demo data</h3>
+<pre>npm run db:setup               <span class="c"># builds all tables, triggers, functions + demo data</span>
+npm run db:embed               <span class="c"># AI model reads every note (first run downloads the model)</span></pre></div></div>
+
+<div class="step"><div class="n">5</div><div>
+<h3>Start the app</h3>
+<pre>npm run dev</pre>
+<p>Open <b>http://localhost:3000</b> and log in:</p>
+<table>
+  <tr><th>Role</th><th>Email</th><th>Password</th></tr>
+  <tr><td>Student</td><td><code>ananya.rao@scholarmesh.test</code></td><td><code>Scholar@123</code></td></tr>
+  <tr><td>Admin</td><td><code>admin@scholarmesh.test</code></td><td><code>Admin@12345</code></td></tr>
+</table>
+<p>Every other demo student (e.g. <code>rahul.verma@scholarmesh.test</code>) also uses <code>Scholar@123</code>.</p>
+</div></div>
+
+<div class="tip"><b>Next time</b> you only need: open Docker Desktop → in the project folder run <code>docker compose up -d</code> → then
+<code>cd web</code> and <code>npm run dev</code>. Stop the app with <b>Ctrl + C</b>; stop the database with <code>docker compose down</code> (your data is kept).</div>
+
+<div class="warn"><b>Sharing the computer or a network?</b> Change the passwords in <code>.env</code>, put the same app password into
+<code>web/.env.local</code> (inside <code>DATABASE_URL</code>), and set <code>AUTH_SECRET</code> to a random value:
+<code>node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"</code>. Then run <code>npm run db:setup</code> again.</div>
+
+<h3>If something goes wrong</h3>
+<table>
+  <tr><th style="width:40%">Problem</th><th>Fix</th></tr>
+  <tr><td><code>docker</code> says it cannot connect</td><td>Docker Desktop is not running. Open it, wait a minute, try again.</td></tr>
+  <tr><td>The first <code>npm run dev</code> stops with a "Next.js security" message</td><td>Just run <code>npm run dev</code> again — it only shows the notice once.</td></tr>
+  <tr><td>"password authentication failed for user scholarmesh_app"</td><td>The app password in <code>web/.env.local</code> doesn't match <code>APP_DB_PASSWORD</code> in <code>.env</code>. Make them equal, then <code>npm run db:setup</code>.</td></tr>
+  <tr><td>Port 3000 or 5433 already in use</td><td>App: <code>npm run dev -- -p 3001</code>. Database: change <code>POSTGRES_PORT</code> in <code>.env</code> and the port in <code>DATABASE_URL</code>, then <code>docker compose up -d</code>.</td></tr>
+  <tr><td>Semantic search finds nothing / notes show "Embedding…"</td><td>Run <code>npm run db:embed</code> (needs internet the first time to download the model).</td></tr>
+  <tr><td>Want the original demo data back</td><td><code>npm run db:setup</code> then <code>npm run db:embed</code> (inside <code>web</code>).</td></tr>
+</table>
+
+<!-- ============================================================ 6. CHEAT SHEET -->
+<h2 class="same-page">6. Handy commands &amp; where things are</h2>
+<table>
+  <tr><th style="width:46%">Command (inside <code>web/</code> unless noted)</th><th>What it does</th></tr>
+  <tr><td><code>npm run dev</code></td><td>Start the website at http://localhost:3000</td></tr>
+  <tr><td><code>npm test</code></td><td>Run the 91 code + database tests</td></tr>
+  <tr><td><code>npm run test:e2e</code></td><td>Run the 10 browser tests (first time: <code>npx playwright install chromium</code>)</td></tr>
+  <tr><td><code>npm run db:setup</code> / <code>npm run db:embed</code></td><td>Rebuild the database / compute missing embeddings</td></tr>
+  <tr><td>(project folder) <code>cat db/10_important_queries.sql | docker exec -i scholarmesh-db psql -U postgres -d scholarmesh</code></td><td>Run the demo SQL queries (joins, GROUP BY, window functions, vector search, EXPLAIN …)</td></tr>
+  <tr><td>(project folder) <code>docker exec -it scholarmesh-db psql -U postgres -d scholarmesh</code></td><td>Open a SQL prompt inside the database</td></tr>
+</table>
+<table>
+  <tr><th style="width:30%">Folder / file</th><th>What's inside</th></tr>
+  <tr><td><code>db/</code></td><td>All SQL, run in order: <code>01</code> schema → <code>02</code> Phase 2 changes → <code>03</code> views → <code>04</code> functions → <code>05</code> triggers → <code>06</code> permissions → <code>07–09</code> demo data → <code>10</code> demo queries</td></tr>
+  <tr><td><code>web/src/app/</code></td><td>Website pages and the <code>/api</code> endpoints</td></tr>
+  <tr><td><code>web/src/lib/repos/</code></td><td>All SQL the app runs (parameterised, safe from SQL injection)</td></tr>
+  <tr><td><code>web/tests/</code></td><td>Automated tests</td></tr>
+  <tr><td><code>docs/</code></td><td>Technical report (PDF), this guide, diagrams, screenshots</td></tr>
+  <tr><td><code>docker-compose.yml</code>, <code>.env.example</code></td><td>Database container and settings templates</td></tr>
+</table>
+<div class="tip"><b>A 2-minute demo:</b> log in as Ananya → Search <i>"bcnf decomposition"</i> in Keyword mode (0 results), then Semantic mode (finds the note) →
+Study groups → open <i>Query Optimizers</i> → Join (the database refuses: group full) → log out, log in as admin → show the charts and the audit log.</div>
+
+</body>
+</html>
