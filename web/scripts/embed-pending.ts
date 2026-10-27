@@ -25,6 +25,16 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error(error);
+  const code = (error as { code?: string }).code;
+  if (code === "28P01") {
+    console.error(
+      "Cannot log in as the app user: the password inside DATABASE_URL (web/.env.local) does not match the database.\n" +
+        "Make it equal to APP_DB_PASSWORD in ../.env, then run  npm run db:setup  (this also resets the demo data).",
+    );
+  } else if (code === "ECONNREFUSED") {
+    console.error("Cannot reach PostgreSQL. Is Docker Desktop running? Start the database with:  docker compose up -d");
+  } else {
+    console.error(error);
+  }
   process.exit(1);
 });

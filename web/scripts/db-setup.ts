@@ -38,7 +38,22 @@ async function main(): Promise<void> {
     password: requireEnv("POSTGRES_PASSWORD"),
     database: requireEnv("POSTGRES_DB"),
   });
-  await client.connect();
+  try {
+    await client.connect();
+  } catch (error) {
+    const code = (error as { code?: string }).code;
+    if (code === "28P01") {
+      throw new Error(
+        `Cannot log in to PostgreSQL as "${process.env.POSTGRES_USER}": the password in .env does not match the database.\n` +
+          "PostgreSQL keeps the password it was first created with. Either put back the .env you used then, or start fresh\n" +
+          "(this deletes the database data):  docker compose down -v   then   docker compose up -d   then run this again.",
+      );
+    }
+    if (code === "ECONNREFUSED") {
+      throw new Error("Cannot reach PostgreSQL. Is Docker Desktop running? Start the database with:  docker compose up -d");
+    }
+    throw error;
+  }
   client.on("notice", () => undefined); // silence "does not exist, skipping"
 
   try {
