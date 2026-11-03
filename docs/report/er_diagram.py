@@ -159,7 +159,7 @@ def main():
         "Diamond: relationship · double diamond: identifying relationship",
         "Dashed oval: attribute of a relationship (M:N junction column)",
         "Double line: total participation (every row must take part)",
-        "1 / N / M: cardinality · FKs appear only after mapping (see §3)",
+        "1 / N / M: cardinality · FKs appear only after mapping to tables",
     ]
     for i, text in enumerate(legend):
         out.append(f'<text x="{lx + 16}" y="{ly + 50 + i * 21}" font-size="11.5" fill="{MUTED}">{esc(text)}</text>')

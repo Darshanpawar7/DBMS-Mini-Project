@@ -158,5 +158,5 @@
 <text x="776" y="832" font-size="11.5" fill="#64748b">Diamond: relationship · double diamond: identifying relationship</text>
 <text x="776" y="853" font-size="11.5" fill="#64748b">Dashed oval: attribute of a relationship (M:N junction column)</text>
 <text x="776" y="874" font-size="11.5" fill="#64748b">Double line: total participation (every row must take part)</text>
-<text x="776" y="895" font-size="11.5" fill="#64748b">1 / N / M: cardinality · FKs appear only after mapping (see §3)</text>
+<text x="776" y="895" font-size="11.5" fill="#64748b">1 / N / M: cardinality · FKs appear only after mapping to tables</text>
 </svg>
