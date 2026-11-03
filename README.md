@@ -21,7 +21,8 @@ DBMS Level 3 mini project, PES University (EC Campus), Dept. of CSE. Database op
 
 - **New here?** Start with the short, plain-language guide — what it is, tech stack, how it works, screenshots and
   setup: [`docs/ScholarMesh_Project_Guide.pdf`](docs/ScholarMesh_Project_Guide.pdf).
-- The full technical write-up (ER diagram, schema, data dictionary, queries, test results) is
+- The project report, in the required outline (title, students, abstract, tech stack, SQL commands, vector
+  database commands, Next.js project tree, code and demo screenshots, rubric status), is
   [`docs/ScholarMesh_Phase2_Report.pdf`](docs/ScholarMesh_Phase2_Report.pdf).
 - **Demo video** (4:47, with chapters): [`docs/demo/ScholarMesh_Demo.mp4`](docs/demo/ScholarMesh_Demo.mp4), with a
   timestamped narration guide in [`docs/demo/demo-script.md`](docs/demo/demo-script.md).
@@ -152,5 +153,5 @@ docker exec -i scholarmesh-db psql -U postgres -d scholarmesh < db/10_important_
 | Darshan P Pawar | PES2UG24CS143 | Notes & search: Phase 1 design and fixes, Phase 2 schema, pgvector, chunking, keyword/semantic/hybrid search, seed data, upload and search UI, report |
 | Dhanush V Biradar | PES2UG24CS155 | People, groups & admin: views, group triggers and procedures, recommendations, audit and grants, important queries, auth and API layer, group/admin pages, tests |
 
-Each member commits their own work from their own GitHub account so the history shows individual
-contributions (one feature branch per area, merged through pull requests).
+Each member should commit their own work from their own GitHub account, so the history shows individual
+contributions.
