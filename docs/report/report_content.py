@@ -3,31 +3,27 @@
 # 1. Title and 2. Students' SRN and name
 COVER = """
 <section class="cover">
-  <p class="kicker">DBMS Mini Project · Level 3 · Project Report</p>
+  <p class="uni">PES UNIVERSITY</p>
+  <p>Electronic City Campus</p>
+  <p>Department of Computer Science and Engineering</p>
+  <p class="course">Database Management Systems: Level 3 Mini Project</p>
+  <p class="doc">PROJECT REPORT</p>
+  <p>on</p>
   <h1>ScholarMesh</h1>
-  <p class="subtitle">Semantic Research-Notes Discovery &amp; Study-Group Matchmaking Platform</p>
-  <table class="grid students">
-    <thead><tr><th>Student name</th><th>SRN</th></tr></thead>
+  <p class="subtitle">Semantic Research-Notes Discovery and Study-Group Matchmaking Platform</p>
+  <p class="by">Submitted by</p>
+  <table class="students">
+    <thead><tr><th>Name</th><th>SRN</th></tr></thead>
     <tbody>
       <tr><td>Darshan P Pawar</td><td>PES2UG24CS143</td></tr>
       <tr><td>Dhanush V Biradar</td><td>PES2UG24CS155</td></tr>
     </tbody>
   </table>
   <table class="meta">
-    <tr><th>Course</th><td>DBMS Experiential Learning — Level 3 Project</td></tr>
-    <tr><th>Institution</th><td>PES University, Electronic City Campus · Department of Computer Science and Engineering</td></tr>
-    <tr><th>Database option</th><td>Option 2 — SQL (PostgreSQL 17) + Vector database (pgvector)</td></tr>
+    <tr><th>Database option</th><td>Option 2: SQL (PostgreSQL 17) with a vector database (pgvector)</td></tr>
     <tr><th>Source code</th><td>https://github.com/Darshanpawar7/DBMS-Mini-Project</td></tr>
-    <tr><th>Demo video</th><td><code>docs/demo/ScholarMesh_Demo.mp4</code> in the repository (4 min 47 s, with chapters)</td></tr>
+    <tr><th>Demo video</th><td>docs/demo/ScholarMesh_Demo.mp4 in the repository</td></tr>
   </table>
-  <div class="cover-stats">
-    <div><b>12</b><span>tables</span></div>
-    <div><b>34</b><span>indexes</span></div>
-    <div><b>14</b><span>triggers</span></div>
-    <div><b>15</b><span>functions &amp; procedures</span></div>
-    <div><b>5</b><span>views (1 materialized)</span></div>
-    <div><b>__TOTAL_TESTS__</b><span>passing tests</span></div>
-  </div>
 </section>
 """
 
@@ -37,10 +33,11 @@ ABSTRACT = """
 tools searches it by exact words. <b>ScholarMesh</b> is a web application where students upload notes, find them <i>by
 meaning</i> rather than by keywords, and are matched with study groups and classmates who study the same topics.
 One PostgreSQL 17 database holds two kinds of data: a normalised relational schema of 12 tables for users, courses,
-notes, tags, groups and activity, and — through the pgvector extension — a vector database that stores a
+notes, tags, groups and activity, and, through the pgvector extension, a vector database that stores a
 384-dimensional embedding for every passage of every note, computed locally with the all-MiniLM-L6-v2 model.
-Three search modes — keyword (full-text search, GIN index), semantic (cosine similarity, HNSW index) and hybrid
-(Reciprocal Rank Fusion) — share one access-control function, so private notes never appear in anyone else's results.
+There are three search modes: keyword (full-text search, GIN index), semantic (cosine similarity, HNSW index) and
+hybrid (Reciprocal Rank Fusion). All three use one access-control function, so private notes never appear in anyone
+else's results.
 Averaged embeddings form interest profiles that rank study groups by 70 % vector similarity and 30 % shared topics.
 The database enforces the business rules itself: 25 CHECK constraints, 14 triggers, 12 functions, 3 stored
 procedures, views and a materialized view, row locks that stop two students taking the last seat in a group, a JSONB
@@ -52,9 +49,9 @@ full-text search, triggers, stored procedures, Next.js</p>
 """
 
 PROBLEM = """
-<h3 id="s3-1">3.1 Problem statement and motivation</h3>
-<p>Students collect a large amount of material over a semester — lecture notes, PDFs, cheat sheets, past-paper
-solutions — but it ends up scattered across Drive folders, WhatsApp groups and laptops. Every one of those tools
+<h3 id="s3-1">3.1 Problem Statement and Motivation</h3>
+<p>Students collect a large amount of material over a semester (lecture notes, PDFs, cheat sheets, past-paper
+solutions), but it ends up scattered across Drive folders, WhatsApp groups and laptops. Every one of those tools
 searches by <em>exact keywords or file names</em>. A student who wants "notes that explain how a model decides which
 words matter" finds nothing unless someone happened to use those words; the note titled
 <em>Transformers and Self-Attention Explained</em> stays invisible.</p>
@@ -65,10 +62,10 @@ passages and turned into <em>embeddings</em> (lists of 384 numbers that capture 
 meaning, not by wording. The same embeddings, averaged over what each student uploads, saves and searches for, form an
 <em>interest profile</em> that the database uses to recommend study groups and classmates. Course enrollment and a
 three-level visibility rule (public / course-only / private) decide what anyone is allowed to see.</p>
-<div class="callout"><b>Why this is more than CRUD.</b> Retrieval is by vector similarity and full-text ranking, not
+<p><b>Why this is more than CRUD.</b> Retrieval is by vector similarity and full-text ranking, not
 <code>WHERE title LIKE …</code>; access control is enforced inside every query path by one database function; group
 matching combines relational facts (enrollment, membership) with vector similarity; and business rules such as seat
-limits and admin hand-over are enforced by triggers that also hold under concurrent requests.</div>
+limits and admin hand-over are enforced by triggers that also hold under concurrent requests.</p>
 """
 
 OBJECTIVES = """
@@ -78,7 +75,7 @@ OBJECTIVES = """
       the Phase 1 design with <code>ALTER</code> where Phase 2 needs more.</li>
   <li>Store note embeddings in a vector store (pgvector) linked to the relational data with real foreign keys, and
       retrieve notes by cosine similarity through an HNSW index.</li>
-  <li>Offer three search modes — keyword (full-text), semantic (vector) and hybrid (rank fusion) — that all respect
+  <li>Offer three search modes, keyword (full-text), semantic (vector) and hybrid (rank fusion), that all respect
       the same access-control rule.</li>
   <li>Recommend study groups and partners from enrollment plus interest-vector similarity.</li>
   <li>Enforce data integrity in the database itself: constraints, triggers, transactions, row locks and a
@@ -119,7 +116,7 @@ SCOPE = """
 """
 
 REQUIREMENTS = """
-<h3 id="s3-4">3.4 Users, roles and functional requirements</h3>
+<h3 id="s3-4">3.4 Users, Roles and Functional Requirements</h3>
 <p>Two <b>system roles</b> are stored in <code>STUDENT.role</code> (CHECK: <code>student</code> | <code>admin</code>).
 Inside each study group a student additionally has a <b>group role</b> in <code>GROUP_MEMBERSHIP.role</code>
 (<code>admin</code> | <code>member</code>). Self-registration always creates a student; only an admin can promote someone.</p>
@@ -147,7 +144,7 @@ Inside each study group a student additionally has a <b>group role</b> in <code>
 """
 
 PHASE1_REVIEW = """
-<h3 id="s5-1">5.1 Phase 1 review — issues found and fixed</h3>
+<h3 id="s5-1">5.1 Phase 1 Review: Issues Found and Fixed</h3>
 <p>The Week-4 schema was re-checked before building on it. Each fix is marked <code>FIX n</code> in
 <code>db/01_schema.sql</code> or implemented through <code>ALTER</code> in <code>db/02_phase2_alter.sql</code>.</p>
 <table class="grid">
@@ -157,26 +154,26 @@ PHASE1_REVIEW = """
 <tr><td>2</td><td>No index on the second column of composite keys (<code>ENROLLMENT.course_id</code>, <code>DOCUMENT_TAG.tag_id</code>, <code>BOOKMARK.doc_id</code>, <code>GROUP_MEMBERSHIP.student_id</code>)</td><td>"Which groups is this student in?" and "which notes have this tag?" were full table scans</td><td>Four indexes added (+ <code>STUDY_GROUP.created_by</code>)</td></tr>
 <tr><td>3</td><td><code>idx_document_visibility</code></td><td>Only three distinct values, so the planner would never use it</td><td>Replaced by composite <code>(course_id, visibility)</code> matching the access rule, plus a partial index on public notes</td></tr>
 <tr><td>4</td><td>No system role column</td><td>The brief needs at least two roles; the schema could not express an admin</td><td><code>ALTER TABLE STUDENT ADD role, is_active, last_login_at</code></td></tr>
-<tr><td>5</td><td><code>DOCUMENT.vector_id</code> — a free-text pointer into an external vector store</td><td>Nothing stopped it from pointing at a vector that no longer exists; one vector per document is too coarse for good retrieval</td><td>Dropped; embeddings now live in <code>DOC_CHUNK</code> (weak entity) with a real foreign key, one vector per passage</td></tr>
+<tr><td>5</td><td><code>DOCUMENT.vector_id</code>, a free-text pointer into an external vector store</td><td>Nothing stopped it from pointing at a vector that no longer exists; one vector per document is too coarse for good retrieval</td><td>Dropped; embeddings now live in <code>DOC_CHUNK</code> (weak entity) with a real foreign key, one vector per passage</td></tr>
 <tr><td>6</td><td><code>STUDY_GROUP.created_by … ON DELETE CASCADE</code></td><td>If the creator deleted their account, the whole group disappeared for every other member</td><td><code>ON DELETE SET NULL</code>; a trigger hands the admin role to the longest-standing member</td></tr>
 <tr><td>7</td><td>E-mail uniqueness was case-sensitive</td><td><code>Ana@x.com</code> and <code>ana@x.com</code> could be two accounts</td><td>Unique index on <code>LOWER(email)</code> + normalising trigger</td></tr>
 <tr><td>8</td><td><code>max_members</code> never enforced; group creator not guaranteed to be a member</td><td>Groups could be overfilled; groups could exist without an admin</td><td>Triggers T5–T9 (seat limit with row lock, creator becomes admin, succession)</td></tr>
 <tr><td>9</td><td><code>TIMESTAMP</code> without time zone</td><td>Ambiguous instants once the server and users are in different zones</td><td><code>TIMESTAMPTZ</code> everywhere</td></tr>
-<tr><td>10</td><td>Few validation rules (only year, visibility, role CHECKs)</td><td>The brief requires validation at the database level</td><td>22 new CHECK constraints — 25 in total (e-mail format, bcrypt-only passwords, semester format, tag format, sizes …)</td></tr>
+<tr><td>10</td><td>Few validation rules (only year, visibility, role CHECKs)</td><td>The brief requires validation at the database level</td><td>22 new CHECK constraints, 25 in total (e-mail format, bcrypt-only passwords, semester format, tag format, sizes …)</td></tr>
 <tr><td>11</td><td>ER diagram drew the relationship attribute <code>semester</code> as a rectangle</td><td>In Chen notation rectangles are entities</td><td>Redrawn as an attribute oval (Figure 1)</td></tr>
 </tbody></table>
 """
 
 TECH_STACK = """
-<h2 id="s4">4. Tech stack</h2>
+<h2 id="s4">4. Tech Stack</h2>
 <table class="grid">
 <thead><tr><th style="width:20%">Layer</th><th style="width:38%">Technology (version)</th><th>Used for</th></tr></thead>
 <tbody>
 <tr><td>Relational database</td><td>PostgreSQL 17, run in Docker (image <code>pgvector/pgvector:pg17</code>)</td><td>12 tables, keys, constraints, views, functions, procedures, triggers, transactions</td></tr>
-<tr><td>Vector database</td><td>pgvector extension — <code>vector(384)</code> type, HNSW index, cosine distance <code>&lt;=&gt;</code></td><td>Passage and question embeddings; semantic and hybrid search; group and partner matching</td></tr>
+<tr><td>Vector database</td><td>pgvector extension: <code>vector(384)</code> type, HNSW index, cosine distance <code>&lt;=&gt;</code></td><td>Passage and question embeddings; semantic and hybrid search; group and partner matching</td></tr>
 <tr><td>Full-text search</td><td>PostgreSQL <code>tsvector</code> (generated column) + GIN index</td><td>Keyword search with ranking and highlighted snippets</td></tr>
 <tr><td>Semi-structured data</td><td>PostgreSQL <code>JSONB</code></td><td>Before/after images of changed rows in the audit log</td></tr>
-<tr><td>Embedding model</td><td>all-MiniLM-L6-v2 (ONNX, 8-bit) via Transformers.js (<code>@huggingface/transformers</code> 4)</td><td>Turning passages and questions into 384-number vectors, locally — no API key, no data leaves the server</td></tr>
+<tr><td>Embedding model</td><td>all-MiniLM-L6-v2 (ONNX, 8-bit) via Transformers.js (<code>@huggingface/transformers</code> 4)</td><td>Turning passages and questions into 384-number vectors locally; no API key is needed and no data leaves the server</td></tr>
 <tr><td>Web framework</td><td>Next.js 16.4 (App Router, Server Components, Route Handlers)</td><td>All pages and the REST API layer (34 handlers in 22 routes)</td></tr>
 <tr><td>User interface</td><td>React 19.3, Tailwind CSS 4</td><td>Forms, tables, search, filters, dashboards and charts</td></tr>
 <tr><td>Language</td><td>TypeScript 5 (strict mode)</td><td>Application, scripts and tests</td></tr>
@@ -190,7 +187,7 @@ TECH_STACK = """
 """
 
 JUSTIFICATION = """
-<h3 id="s4-1">4.1 Why SQL plus a vector database</h3>
+<h3 id="s4-1">4.1 Why SQL plus a Vector Database</h3>
 <table class="grid">
 <thead><tr><th>Data</th><th>Stored in</th><th>Why</th></tr></thead>
 <tbody>
@@ -211,7 +208,7 @@ store the app would have to fetch nearest neighbours first and filter afterwards
 deleting a note deletes its vectors in the same transaction. Phase 1's string pointer could dangle.</li>
 <li><b>Transactions span both.</b> Re-chunking after an edit and marking the document <code>pending</code> happen atomically.</li>
 <li><b>Vectors become SQL values.</b> <code>AVG(embedding)</code> builds document centroids and student interest
-vectors inside views — the basis of group matching.</li>
+vectors inside views, which is the basis of group matching.</li>
 <li><b>Operationally simple.</b> One Docker container, one backup, one connection pool.</li>
 </ul>
 <p>The trade-off is scale: a dedicated vector database is better beyond tens of millions of vectors. For a university's
@@ -219,22 +216,22 @@ notes (thousands of documents) PostgreSQL with HNSW answers in milliseconds.</p>
 """
 
 VECTOR_MODEL = """
-<h2 id="s6">6. NoSQL / Vector database commands</h2>
+<h2 id="s6">6. NoSQL / Vector Database Commands</h2>
 <p>The non-relational side of ScholarMesh is a <b>vector database</b>: pgvector adds a <code>vector</code> data type, distance
 operators and approximate-nearest-neighbour indexes to PostgreSQL. Semi-structured audit records use <code>JSONB</code>
 (schema-less documents inside a column). §6.2 lists the commands; §6.3 shows them running on the real data.</p>
-<h3 id="s6-1">6.1 Vector data model</h3>
+<h3 id="s6-1">6.1 Vector Data Model</h3>
 <table class="grid">
 <tbody>
-<tr><th>What is embedded</th><td>(a) every <b>passage</b> of every note — the text is split by trigger T4 using
+<tr><th>What is embedded</th><td>(a) every <b>passage</b> of every note: the text is split by trigger T4 using
 <code>fn_chunk_text</code> into chunks of at most 800 characters (paragraphs kept together, long paragraphs split on
 sentence boundaries); (b) every <b>search query</b>, stored in <code>SEARCH_LOG.query_embedding</code> for interest profiles.</td></tr>
 <tr><th>Model</th><td><code>sentence-transformers/all-MiniLM-L6-v2</code> (ONNX, 8-bit quantised), run locally in Node.js with
-Transformers.js — no API key and no note text leaves the server. Mean pooling + L2 normalisation → 384-dimensional unit vectors.
+Transformers.js, so no API key is needed and no note text leaves the server. Mean pooling + L2 normalisation → 384-dimensional unit vectors.
 Chosen after comparing three 384-d models on sample questions: it gave the clearest gap between relevant and unrelated notes.</td></tr>
 <tr><th>Storage</th><td><code>DOC_CHUNK.embedding vector(384)</code> (pgvector), <code>NULL</code> until the embedding worker fills it;
 <code>DOCUMENT.embedding_status</code> tracks <code>pending → ready</code> (or <code>failed</code>).</td></tr>
-<tr><th>Index</th><td><code>HNSW (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64)</code> — a navigable graph that finds
+<tr><th>Index</th><td><code>HNSW (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64)</code>: a navigable graph that finds
 approximate nearest neighbours without scanning every vector (EXPLAIN in §5.12, Q16).</td></tr>
 <tr><th>Similarity metric</th><td>Cosine distance, operator <code>&lt;=&gt;</code>; the app reports <i>similarity = 1 − distance</i>.</td></tr>
 <tr><th>Retrieval</th><td><code>fn_semantic_search</code>: take the nearest passages among documents the student may see, keep the best passage per
@@ -243,7 +240,7 @@ document, drop matches below 0.28 similarity, return the passage as the snippet.
 """
 
 VECTOR_METHODS = """
-<h3 id="s6-4">6.4 Choosing the similarity cut-off</h3>
+<h3 id="s6-4">6.4 Choosing the Similarity Cut-off</h3>
 <p>The threshold was measured, not guessed. Off-topic questions never scored above 0.27 while relevant notes scored 0.38+:</p>
 <table class="grid compact">
 <thead><tr><th>Question</th><th>Best similarity</th><th>Best note</th><th>Returned at 0.28?</th></tr></thead>
@@ -257,14 +254,14 @@ VECTOR_METHODS = """
 <tr><td>photosynthesis in plants</td><td>0.19</td><td>(unrelated)</td><td>no</td></tr>
 </tbody></table>
 
-<h3 id="s6-5">6.5 Hybrid search — Reciprocal Rank Fusion</h3>
+<h3 id="s6-5">6.5 Hybrid Search with Reciprocal Rank Fusion</h3>
 <p>Keyword search is precise for exact terms ("BCNF"); semantic search understands paraphrases. <code>fn_hybrid_search</code>
 runs both and merges them with <b>Reciprocal Rank Fusion</b>: <code>score = 1/(60 + keyword_rank) + 1/(60 + semantic_rank)</code>
 (a missing rank contributes 0). A note found by both methods rises to the top; a note found by only one still appears.
 Example: <i>"bcnf decomposition"</i> returns nothing in keyword mode (no note contains "decomposition") but the normalization
 note in semantic and hybrid mode (screenshots in §8.2).</p>
 
-<h3 id="s6-6">6.6 Interest profiles and study-group matching</h3>
+<h3 id="s6-6">6.6 Interest Profiles and Study-Group Matching</h3>
 <p><code>v_doc_centroid</code> averages each document's passage vectors. <code>v_student_interest</code> averages, per student, the
 centroids of notes they uploaded or bookmarked and the vectors of their searches from the last 120 days. A group's interest is
 the average of its members' interest vectors. <code>fn_recommend_groups</code> considers only groups in the student's
@@ -273,7 +270,7 @@ courses that still have a seat and ranks them by</p>
 <p>where "topics" are the tags of notes each person uploaded or bookmarked <i>within that group's course</i>.
 <code>fn_recommend_partners</code> ranks classmates (students sharing a course) by interest similarity.</p>
 
-<h3 id="s6-7">6.7 Embedding pipeline</h3>
+<h3 id="s6-7">6.7 Embedding Pipeline</h3>
 <ol>
 <li>Upload: one transaction inserts the <code>DOCUMENT</code>; trigger T4 writes its <code>DOC_CHUNK</code> rows (no vectors yet); tags are linked.</li>
 <li>After commit the API embeds the new chunks in one batch and writes them with a single set-based <code>UPDATE … FROM unnest(…)</code>; the document becomes <code>ready</code>.</li>
@@ -282,9 +279,9 @@ courses that still have a seat and ranks them by</p>
 """
 
 CONCLUSION = """
-<h3 id="s9-4">9.4 Conclusion and future enhancements</h3>
+<h3 id="s9-4">9.4 Conclusion and Future Enhancements</h3>
 <p>ScholarMesh shows how one PostgreSQL database can serve two paradigms at once: a strictly validated relational model
-for people, courses, groups and activity, and a vector store for meaning-based retrieval — joined in single SQL statements
+for people, courses, groups and activity, and a vector store for meaning-based retrieval, joined in single SQL statements
 so that access control, ranking and integrity are guaranteed by the database rather than by application code. Phase 1's
 design was corrected (redundant and missing indexes, a dangling vector pointer, a destructive cascade, missing roles and
 rules) and extended with chunk-level embeddings, full-text search, views, a materialized view, stored functions and
@@ -293,7 +290,7 @@ through a validated API, and __TOTAL_TESTS__ automated tests confirm the behavio
 <h4>Future enhancements</h4>
 <ul>
 <li><b>OCR</b> for scanned PDFs and handwritten notes; image and diagram embeddings.</li>
-<li><b>Verified enrollment</b> — sync <code>ENROLLMENT</code> from the university system, or require a per-course join code.</li>
+<li><b>Verified enrollment:</b> sync <code>ENROLLMENT</code> from the university system, or require a per-course join code.</li>
 <li><b>Row-Level Security</b> policies so the access rule is enforced even for ad-hoc SQL, not only through the functions.</li>
 <li><b>Background job queue</b> (e.g. a worker table polled with <code>SELECT … FOR UPDATE SKIP LOCKED</code>) for large uploads.</li>
 <li><b>Re-ranking</b> the top hybrid results with a cross-encoder; per-course embedding fine-tuning.</li>
