@@ -23,12 +23,14 @@ DBMS Level 3 mini project, PES University (EC Campus), Dept. of CSE. Database op
   setup: [`docs/ScholarMesh_Project_Guide.pdf`](docs/ScholarMesh_Project_Guide.pdf).
 - The full technical write-up (ER diagram, schema, data dictionary, queries, test results) is
   [`docs/ScholarMesh_Phase2_Report.pdf`](docs/ScholarMesh_Phase2_Report.pdf).
+- **Demo video** (4:47, with chapters): [`docs/demo/ScholarMesh_Demo.mp4`](docs/demo/ScholarMesh_Demo.mp4), with a
+  timestamped narration guide in [`docs/demo/demo-script.md`](docs/demo/demo-script.md).
 
 ---
 
 ## Project layout
 
-```
+```text
 db/                         SQL, run in this order by `npm run db:setup`
   01_schema.sql             Phase 1 DDL (corrected; fixes marked FIX 1-7)
   02_phase2_alter.sql       Phase 2 changes: ALTER/ADD/DROP, pgvector, DOC_CHUNK, AUDIT_LOG, indexes
@@ -42,9 +44,9 @@ db/                         SQL, run in this order by `npm run db:setup`
 web/                        Next.js application
   src/app/                  pages and /api route handlers
   src/lib/repos/            all SQL used by the app (parameterised)
-  scripts/                  db-setup, embedding worker, screenshots, report rendering
+  scripts/                  db-setup, embedding worker, screenshots, demo video, report rendering
   tests/                    unit/, db/ (integration), e2e/ (Playwright)
-docs/                       report (PDF + sources), ER and architecture diagrams, screenshots
+docs/                       report (PDF + sources), ER and architecture diagrams, screenshots, demo video
 docker-compose.yml          PostgreSQL 17 + pgvector
 ```
 
