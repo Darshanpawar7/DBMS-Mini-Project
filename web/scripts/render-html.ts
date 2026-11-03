@@ -21,8 +21,10 @@ async function main(): Promise<void> {
       margin: { top: "16mm", bottom: "16mm", left: "14mm", right: "14mm" },
       displayHeaderFooter: true,
       headerTemplate: "<span></span>",
-      footerTemplate:
-        `<div style="width:100%;font-size:8px;color:#94a3b8;text-align:center;font-family:Arial">${footer} · Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>`,
+      // an empty footer label prints the page number only
+      footerTemplate: footer
+        ? `<div style="width:100%;font-size:8px;color:#94a3b8;text-align:center;font-family:Arial">${footer} · Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>`
+        : `<div style="width:100%;font-size:10px;color:#000;text-align:center;font-family:'Times New Roman',serif"><span class="pageNumber"></span></div>`,
     });
   } else {
     await page.screenshot({ path: output, fullPage: !input.endsWith(".svg") });
