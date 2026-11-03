@@ -1,18 +1,24 @@
-"""Narrative sections of the Phase 2 report (HTML fragments). Assembled by build_report.py."""
+"""Narrative sections of the project report (HTML fragments). Assembled by build_report.py."""
 
+# 1. Title and 2. Students' SRN and name
 COVER = """
 <section class="cover">
-  <p class="kicker">DBMS Mini Project · Level 3 · Phase 2 Submission</p>
+  <p class="kicker">DBMS Mini Project · Level 3 · Project Report</p>
   <h1>ScholarMesh</h1>
   <p class="subtitle">Semantic Research-Notes Discovery &amp; Study-Group Matchmaking Platform</p>
+  <table class="grid students">
+    <thead><tr><th>Student name</th><th>SRN</th></tr></thead>
+    <tbody>
+      <tr><td>Darshan P Pawar</td><td>PES2UG24CS143</td></tr>
+      <tr><td>Dhanush V Biradar</td><td>PES2UG24CS155</td></tr>
+    </tbody>
+  </table>
   <table class="meta">
     <tr><th>Course</th><td>DBMS Experiential Learning — Level 3 Project</td></tr>
     <tr><th>Institution</th><td>PES University, Electronic City Campus · Department of Computer Science and Engineering</td></tr>
-    <tr><th>Team</th><td>Darshan P Pawar — SRN PES2UG24CS143<br/>Dhanush V Biradar — SRN PES2UG24CS155</td></tr>
     <tr><th>Database option</th><td>Option 2 — SQL (PostgreSQL 17) + Vector database (pgvector)</td></tr>
-    <tr><th>Phase 2 scope</th><td>Phase 1 review and fixes · DML and seed data · vector search · advanced database features ·
-      Next.js application with authentication and roles · security · testing · documentation</td></tr>
     <tr><th>Source code</th><td>https://github.com/Darshanpawar7/DBMS-Mini-Project</td></tr>
+    <tr><th>Demo video</th><td><code>docs/demo/ScholarMesh_Demo.mp4</code> in the repository (4 min 47 s, with chapters)</td></tr>
   </table>
   <div class="cover-stats">
     <div><b>12</b><span>tables</span></div>
@@ -25,8 +31,28 @@ COVER = """
 </section>
 """
 
+ABSTRACT = """
+<h2 id="s3">3. Abstract</h2>
+<p class="abstract">Students' study material is scattered across drives, chat groups and laptops, and every one of those
+tools searches it by exact words. <b>ScholarMesh</b> is a web application where students upload notes, find them <i>by
+meaning</i> rather than by keywords, and are matched with study groups and classmates who study the same topics.
+One PostgreSQL 17 database holds two kinds of data: a normalised relational schema of 12 tables for users, courses,
+notes, tags, groups and activity, and — through the pgvector extension — a vector database that stores a
+384-dimensional embedding for every passage of every note, computed locally with the all-MiniLM-L6-v2 model.
+Three search modes — keyword (full-text search, GIN index), semantic (cosine similarity, HNSW index) and hybrid
+(Reciprocal Rank Fusion) — share one access-control function, so private notes never appear in anyone else's results.
+Averaged embeddings form interest profiles that rank study groups by 70 % vector similarity and 30 % shared topics.
+The database enforces the business rules itself: 25 CHECK constraints, 14 triggers, 12 functions, 3 stored
+procedures, views and a materialized view, row locks that stop two students taking the last seat in a group, a JSONB
+audit trail and a least-privilege application login. A Next.js 16 application with student and admin roles uses the
+database only through a validated server-side API, and __TOTAL_TESTS__ automated tests (unit, database integration and
+end-to-end) pass.</p>
+<p class="keywords"><b>Keywords:</b> PostgreSQL, pgvector, vector database, semantic search, embeddings, HNSW,
+full-text search, triggers, stored procedures, Next.js</p>
+"""
+
 PROBLEM = """
-<h2 id="s1">1. Problem statement and motivation</h2>
+<h3 id="s3-1">3.1 Problem statement and motivation</h3>
 <p>Students collect a large amount of material over a semester — lecture notes, PDFs, cheat sheets, past-paper
 solutions — but it ends up scattered across Drive folders, WhatsApp groups and laptops. Every one of those tools
 searches by <em>exact keywords or file names</em>. A student who wants "notes that explain how a model decides which
@@ -46,7 +72,7 @@ limits and admin hand-over are enforced by triggers that also hold under concurr
 """
 
 OBJECTIVES = """
-<h2 id="s2">2. Objectives</h2>
+<h3 id="s3-2">3.2 Objectives</h3>
 <ol>
   <li>Design a normalised relational schema for users, courses, notes, tags, study groups and activity, and evolve
       the Phase 1 design with <code>ALTER</code> where Phase 2 needs more.</li>
@@ -64,10 +90,10 @@ OBJECTIVES = """
 """
 
 SCOPE = """
-<h2 id="s3">3. Scope</h2>
+<h3 id="s3-3">3.3 Scope</h3>
 <div class="two-col">
 <div>
-<h3>In scope</h3>
+<h4>In scope</h4>
 <ul>
   <li>Registration, login, logout; roles <code>student</code> and <code>admin</code>; per-group roles <code>admin</code>/<code>member</code></li>
   <li>Uploading PDF, TXT and Markdown notes (or pasted text); text extraction; chunking; embedding</li>
@@ -78,7 +104,7 @@ SCOPE = """
 </ul>
 </div>
 <div>
-<h3>Out of scope</h3>
+<h4>Out of scope</h4>
 <ul>
   <li>Scanned PDFs (OCR) and images inside documents</li>
   <li>Real-time chat inside study groups; notifications by e-mail</li>
@@ -93,7 +119,7 @@ SCOPE = """
 """
 
 REQUIREMENTS = """
-<h2 id="s4">4. Users, roles and functional requirements</h2>
+<h3 id="s3-4">3.4 Users, roles and functional requirements</h3>
 <p>Two <b>system roles</b> are stored in <code>STUDENT.role</code> (CHECK: <code>student</code> | <code>admin</code>).
 Inside each study group a student additionally has a <b>group role</b> in <code>GROUP_MEMBERSHIP.role</code>
 (<code>admin</code> | <code>member</code>). Self-registration always creates a student; only an admin can promote someone.</p>
@@ -121,7 +147,7 @@ Inside each study group a student additionally has a <b>group role</b> in <code>
 """
 
 PHASE1_REVIEW = """
-<h2 id="s5">5. Phase 1 review — issues found and fixed</h2>
+<h3 id="s5-1">5.1 Phase 1 review — issues found and fixed</h3>
 <p>The Week-4 schema was re-checked before building on it. Each fix is marked <code>FIX n</code> in
 <code>db/01_schema.sql</code> or implemented through <code>ALTER</code> in <code>db/02_phase2_alter.sql</code>.</p>
 <table class="grid">
@@ -141,8 +167,30 @@ PHASE1_REVIEW = """
 </tbody></table>
 """
 
+TECH_STACK = """
+<h2 id="s4">4. Tech stack</h2>
+<table class="grid">
+<thead><tr><th style="width:20%">Layer</th><th style="width:38%">Technology (version)</th><th>Used for</th></tr></thead>
+<tbody>
+<tr><td>Relational database</td><td>PostgreSQL 17, run in Docker (image <code>pgvector/pgvector:pg17</code>)</td><td>12 tables, keys, constraints, views, functions, procedures, triggers, transactions</td></tr>
+<tr><td>Vector database</td><td>pgvector extension — <code>vector(384)</code> type, HNSW index, cosine distance <code>&lt;=&gt;</code></td><td>Passage and question embeddings; semantic and hybrid search; group and partner matching</td></tr>
+<tr><td>Full-text search</td><td>PostgreSQL <code>tsvector</code> (generated column) + GIN index</td><td>Keyword search with ranking and highlighted snippets</td></tr>
+<tr><td>Semi-structured data</td><td>PostgreSQL <code>JSONB</code></td><td>Before/after images of changed rows in the audit log</td></tr>
+<tr><td>Embedding model</td><td>all-MiniLM-L6-v2 (ONNX, 8-bit) via Transformers.js (<code>@huggingface/transformers</code> 4)</td><td>Turning passages and questions into 384-number vectors, locally — no API key, no data leaves the server</td></tr>
+<tr><td>Web framework</td><td>Next.js 16.4 (App Router, Server Components, Route Handlers)</td><td>All pages and the REST API layer (34 handlers in 22 routes)</td></tr>
+<tr><td>User interface</td><td>React 19.3, Tailwind CSS 4</td><td>Forms, tables, search, filters, dashboards and charts</td></tr>
+<tr><td>Language</td><td>TypeScript 5 (strict mode)</td><td>Application, scripts and tests</td></tr>
+<tr><td>Database driver</td><td>node-postgres (<code>pg</code> 8) with a connection pool</td><td>Parameterised SQL and transactions</td></tr>
+<tr><td>Validation</td><td>zod 4</td><td>Checking every API request (mirrors the database CHECK constraints)</td></tr>
+<tr><td>Authentication</td><td>bcryptjs 3 (password hashes), jose 6 (HS256 JWT in an httpOnly cookie)</td><td>Login, sessions, student and admin roles</td></tr>
+<tr><td>File handling</td><td>unpdf 1.8</td><td>Extracting text from uploaded PDF notes</td></tr>
+<tr><td>Testing</td><td>Vitest 5, Playwright 1.64 (Chromium)</td><td>Unit, database integration and end-to-end tests</td></tr>
+<tr><td>Tooling</td><td>Docker Compose, ESLint 9, Git + GitHub</td><td>Running the database, linting, version control</td></tr>
+</tbody></table>
+"""
+
 JUSTIFICATION = """
-<h2 id="s8">8. Database choice and justification</h2>
+<h3 id="s4-1">4.1 Why SQL plus a vector database</h3>
 <table class="grid">
 <thead><tr><th>Data</th><th>Stored in</th><th>Why</th></tr></thead>
 <tbody>
@@ -154,7 +202,7 @@ enrollment); needs transactions and row locks (two students joining the last sea
 <tr><td>Passage embeddings, query embeddings</td><td>pgvector <code>vector(384)</code> + HNSW index</td>
 <td>Notes are unstructured; meaning-based retrieval needs nearest-neighbour search over vectors, which a B-tree cannot do.</td></tr>
 </tbody></table>
-<h3>Why pgvector rather than a separate vector database</h3>
+<h4>Why pgvector rather than a separate vector database</h4>
 <ul>
 <li><b>One query can combine both paradigms.</b> The access rule (enrollment, visibility, ownership) and the vector
 ranking run in the same SQL statement, so a private note can never "leak" through the vector store. With an external
@@ -170,8 +218,12 @@ vectors inside views — the basis of group matching.</li>
 notes (thousands of documents) PostgreSQL with HNSW answers in milliseconds.</p>
 """
 
-VECTOR = """
-<h2 id="s11">11. Vector database and semantic search</h2>
+VECTOR_MODEL = """
+<h2 id="s6">6. NoSQL / Vector database commands</h2>
+<p>The non-relational side of ScholarMesh is a <b>vector database</b>: pgvector adds a <code>vector</code> data type, distance
+operators and approximate-nearest-neighbour indexes to PostgreSQL. Semi-structured audit records use <code>JSONB</code>
+(schema-less documents inside a column). §6.2 lists the commands; §6.3 shows them running on the real data.</p>
+<h3 id="s6-1">6.1 Vector data model</h3>
 <table class="grid">
 <tbody>
 <tr><th>What is embedded</th><td>(a) every <b>passage</b> of every note — the text is split by trigger T4 using
@@ -183,13 +235,15 @@ Chosen after comparing three 384-d models on sample questions: it gave the clear
 <tr><th>Storage</th><td><code>DOC_CHUNK.embedding vector(384)</code> (pgvector), <code>NULL</code> until the embedding worker fills it;
 <code>DOCUMENT.embedding_status</code> tracks <code>pending → ready</code> (or <code>failed</code>).</td></tr>
 <tr><th>Index</th><td><code>HNSW (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64)</code> — a navigable graph that finds
-approximate nearest neighbours without scanning every vector (EXPLAIN in §13, Q16).</td></tr>
+approximate nearest neighbours without scanning every vector (EXPLAIN in §5.12, Q16).</td></tr>
 <tr><th>Similarity metric</th><td>Cosine distance, operator <code>&lt;=&gt;</code>; the app reports <i>similarity = 1 − distance</i>.</td></tr>
 <tr><th>Retrieval</th><td><code>fn_semantic_search</code>: take the nearest passages among documents the student may see, keep the best passage per
 document, drop matches below 0.28 similarity, return the passage as the snippet.</td></tr>
 </tbody></table>
+"""
 
-<h3>Choosing the similarity cut-off</h3>
+VECTOR_METHODS = """
+<h3 id="s6-4">6.4 Choosing the similarity cut-off</h3>
 <p>The threshold was measured, not guessed. Off-topic questions never scored above 0.27 while relevant notes scored 0.38+:</p>
 <table class="grid compact">
 <thead><tr><th>Question</th><th>Best similarity</th><th>Best note</th><th>Returned at 0.28?</th></tr></thead>
@@ -203,14 +257,14 @@ document, drop matches below 0.28 similarity, return the passage as the snippet.
 <tr><td>photosynthesis in plants</td><td>0.19</td><td>(unrelated)</td><td>no</td></tr>
 </tbody></table>
 
-<h3>Hybrid search — Reciprocal Rank Fusion</h3>
+<h3 id="s6-5">6.5 Hybrid search — Reciprocal Rank Fusion</h3>
 <p>Keyword search is precise for exact terms ("BCNF"); semantic search understands paraphrases. <code>fn_hybrid_search</code>
 runs both and merges them with <b>Reciprocal Rank Fusion</b>: <code>score = 1/(60 + keyword_rank) + 1/(60 + semantic_rank)</code>
 (a missing rank contributes 0). A note found by both methods rises to the top; a note found by only one still appears.
 Example: <i>"bcnf decomposition"</i> returns nothing in keyword mode (no note contains "decomposition") but the normalization
-note in semantic and hybrid mode (Figures 5–6).</p>
+note in semantic and hybrid mode (screenshots in §8.2).</p>
 
-<h3>Interest profiles and study-group matching</h3>
+<h3 id="s6-6">6.6 Interest profiles and study-group matching</h3>
 <p><code>v_doc_centroid</code> averages each document's passage vectors. <code>v_student_interest</code> averages, per student, the
 centroids of notes they uploaded or bookmarked and the vectors of their searches from the last 120 days. A group's interest is
 the average of its members' interest vectors. <code>fn_recommend_groups</code> considers only groups in the student's
@@ -219,7 +273,7 @@ courses that still have a seat and ranks them by</p>
 <p>where "topics" are the tags of notes each person uploaded or bookmarked <i>within that group's course</i>.
 <code>fn_recommend_partners</code> ranks classmates (students sharing a course) by interest similarity.</p>
 
-<h3>Embedding pipeline</h3>
+<h3 id="s6-7">6.7 Embedding pipeline</h3>
 <ol>
 <li>Upload: one transaction inserts the <code>DOCUMENT</code>; trigger T4 writes its <code>DOC_CHUNK</code> rows (no vectors yet); tags are linked.</li>
 <li>After commit the API embeds the new chunks in one batch and writes them with a single set-based <code>UPDATE … FROM unnest(…)</code>; the document becomes <code>ready</code>.</li>
@@ -228,7 +282,7 @@ courses that still have a seat and ranks them by</p>
 """
 
 CONCLUSION = """
-<h2 id="s19">19. Conclusion and future enhancements</h2>
+<h3 id="s9-4">9.4 Conclusion and future enhancements</h3>
 <p>ScholarMesh shows how one PostgreSQL database can serve two paradigms at once: a strictly validated relational model
 for people, courses, groups and activity, and a vector store for meaning-based retrieval — joined in single SQL statements
 so that access control, ranking and integrity are guaranteed by the database rather than by application code. Phase 1's
@@ -236,7 +290,7 @@ design was corrected (redundant and missing indexes, a dangling vector pointer, 
 rules) and extended with chunk-level embeddings, full-text search, views, a materialized view, stored functions and
 procedures, triggers, an audit trail and a least-privilege application role. A Next.js application exposes all of it
 through a validated API, and __TOTAL_TESTS__ automated tests confirm the behaviour, including real races for the last seat in a group and for leaving one.</p>
-<h3>Future enhancements</h3>
+<h4>Future enhancements</h4>
 <ul>
 <li><b>OCR</b> for scanned PDFs and handwritten notes; image and diagram embeddings.</li>
 <li><b>Verified enrollment</b> — sync <code>ENROLLMENT</code> from the university system, or require a per-course join code.</li>

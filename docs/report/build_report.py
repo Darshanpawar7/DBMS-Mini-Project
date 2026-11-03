@@ -1,13 +1,21 @@
-"""Builds docs/report/report.html from the narrative sections, live database exports and test results.
+"""Builds docs/report/report.html from the narrative sections, live database exports, source files and test results.
 
   python docs/report/build_report.py
-  cd web && npx tsx scripts/render-html.ts ../docs/report/report.html ../docs/ScholarMesh_Phase2_Report.pdf
+  cd web && npx tsx scripts/render-html.ts ../docs/report/report.html ../docs/ScholarMesh_Phase2_Report.pdf 1300 960 "ScholarMesh · Project Report"
 Inputs (docs/report/data/): data-dictionary.json, indexes.json, queries-output.txt, vitest.json, playwright.json
+
+The sections follow the required report outline: 1 Title, 2 Students, 3 Abstract, 4 Tech stack, 5 SQL commands,
+6 NoSQL/vector commands, 7 Next.js project tree, 8 code and demo screenshots, 9 evaluation rubrics.
 """
 import html
 import json
 import re
+import subprocess
 from pathlib import Path
+
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
 
 import report_content as rc
 
@@ -24,15 +32,37 @@ def load(name):
     return json.loads((DATA / name).read_text(encoding="utf-8"))
 
 
-# ------------------------------------------------------------------ 6-7 ER + relational schema
+# ------------------------------------------------------------------ source excerpts (code "screenshots")
+LEXERS = {".ts": "typescript", ".tsx": "tsx", ".sql": "postgresql"}
+
+
+def excerpt(path, start, end=None):
+    """Lines of a repository file from the first line containing `start` through the first line (from there on)
+    matching the regex `end`. Returns (first line number, text)."""
+    lines = (ROOT / path).read_text(encoding="utf-8").splitlines()
+    first = next(i for i, line in enumerate(lines) if start in line)
+    last = next(i for i in range(first, len(lines)) if re.search(end, lines[i])) if end else first
+    return first + 1, "\n".join(lines[first:last + 1])
+
+
+def code_window(path, start, end=None):
+    """A source excerpt drawn as an editor window, with the real file name and line numbers."""
+    line_no, code = excerpt(path, start, end)
+    formatter = HtmlFormatter(noclasses=True, style="github-dark", nobackground=True, linenos="inline", linenostart=line_no)
+    body = highlight(code, get_lexer_by_name(LEXERS[Path(path).suffix]), formatter)
+    dots = "".join(f'<i style="background:{c}"></i>' for c in ("#f87171", "#fbbf24", "#34d399"))
+    return f'<div class="window"><div class="bar">{dots}<span>{esc(path)}</span></div>{body}</div>'
+
+
+# ------------------------------------------------------------------ 5.2-5.3 ER + relational schema
 ER_SECTION = """
 <div class="landscape">
-<h2 id="s6">6. Entity–relationship diagram</h2>
+<h3 id="s5-2">5.2 Entity–relationship diagram</h3>
 <figure class="wide">{svg}<figcaption>Figure 1 — Phase 2 ER diagram (Chen notation). New in Phase 2: the weak entity
 DOC_CHUNK with its identifying relationship HAS_CHUNK, the AUDIT_LOG entity, and new attributes on STUDENT, DOCUMENT,
 STUDY_GROUP and SEARCH_LOG.</figcaption></figure>
 </div>
-<h3>Relationships and cardinalities</h3>
+<h4>Relationships and cardinalities</h4>
 <table class="grid compact">
 <thead><tr><th>Relationship</th><th>Entities</th><th>Cardinality</th><th>Participation</th><th>Attributes</th></tr></thead>
 <tbody>
@@ -51,7 +81,7 @@ STUDY_GROUP and SEARCH_LOG.</figcaption></figure>
 """
 
 SCHEMA_SECTION = """
-<h2 id="s7">7. ER-to-relational mapping and relational schema</h2>
+<h3 id="s5-3">5.3 Relational schema (ER-to-relational mapping)</h3>
 <p>Mapping rules: every strong entity becomes a table with its key; a 1:N relationship puts the foreign key on the N side;
 every M:N relationship becomes a junction table whose primary key combines both foreign keys and which carries the
 relationship's attributes; the weak entity DOC_CHUNK takes its owner's key (<code>doc_id</code>) — its identity is
@@ -81,7 +111,7 @@ the materialized view used for analytics — so the schema is in BCNF.</p>
 
 
 def data_dictionary():
-    out = ['<h2 id="s9">9. Data dictionary</h2>',
+    out = ['<h2 id="sA">Appendix A — Data dictionary</h2>',
            '<p>Generated from the PostgreSQL catalog (<code>information_schema</code>, <code>pg_constraint</code> and the '
            '<code>COMMENT ON</code> descriptions stored with the schema) by <code>docs/report/data-dictionary.sql</code>.</p>']
     for table in load("data-dictionary.json"):
@@ -100,7 +130,7 @@ def data_dictionary():
     return "\n".join(out)
 
 
-# ------------------------------------------------------------------ 10 SQL implementation
+# ------------------------------------------------------------------ 5 SQL database commands
 def index_table():
     rows = []
     kinds = {"hnsw": "HNSW (vector)", "gin": "GIN (full text)"}
@@ -121,9 +151,13 @@ def index_table():
             + "".join(rows) + "</tbody></table>")
 
 
-SQL_SECTION_TOP = """
-<h2 id="s10">10. SQL implementation</h2>
-<p>The database is built by running the files in <code>db/</code> in order (<code>npm run db:setup</code>):</p>
+SQL_INTRO = """
+<h2 id="s5">5. SQL — Database commands</h2>
+<p>The relational side of ScholarMesh is PostgreSQL 17. This section starts from the design (Phase 1 fixes, ER diagram,
+relational schema) and then lists the commands that build and use it: DDL (<code>CREATE</code>, <code>ALTER</code>,
+<code>DROP</code>), constraints, indexes, views, functions, procedures, triggers, transactions, <code>GRANT</code>/<code>REVOKE</code>
+and DML queries with their real output. The database is built by running the files in <code>db/</code> in order
+(<code>npm run db:setup</code>):</p>
 <table class="grid compact">
 <thead><tr><th>File</th><th>Contents</th></tr></thead><tbody>
 <tr><td><code>01_schema.sql</code></td><td>Phase 1 DDL, corrected: <code>DROP TABLE … CASCADE</code>, 10 <code>CREATE TABLE</code>, keys, constraints, indexes</td></tr>
@@ -133,10 +167,12 @@ SQL_SECTION_TOP = """
 <tr><td><code>05_triggers.sql</code></td><td>11 trigger functions attached as 14 triggers</td></tr>
 <tr><td><code>06_security.sql</code></td><td>Grants for the least-privilege application role</td></tr>
 <tr><td><code>07–09_seed*.sql</code></td><td>Demo data, inserted with <code>INSERT … SELECT</code> look-ups (no hard-coded ids)</td></tr>
-<tr><td><code>10_important_queries.sql</code></td><td>Demonstration queries (§13)</td></tr>
+<tr><td><code>10_important_queries.sql</code></td><td>Demonstration queries (§5.12 and §6.3)</td></tr>
 </tbody></table>
+"""
 
-<h3>10.1 CREATE, ALTER and DROP</h3>
+SQL_DDL = """
+<h3 id="s5-4">5.4 CREATE, ALTER and DROP</h3>
 <pre class="code">-- Phase 2 evolves the Phase 1 tables instead of re-creating them
 CREATE EXTENSION IF NOT EXISTS vector;
 ALTER TABLE STUDENT
@@ -164,24 +200,24 @@ CREATE TABLE DOC_CHUNK (
 CREATE INDEX idx_chunk_embedding_hnsw ON DOC_CHUNK USING hnsw (embedding vector_cosine_ops);
 CREATE INDEX idx_document_search_tsv  ON DOCUMENT USING GIN (search_tsv);</pre>
 
-<h3>10.2 Validation and integrity inside the database</h3>
+<h3 id="s5-5">5.5 Validation and integrity inside the database</h3>
 <ul>
 <li><b>25 CHECK constraints</b>, e.g. e-mail format, <i>password must be a bcrypt hash</i> (a plain-text password is impossible to store),
 semester format <code>YYYY-ODD|EVEN</code>, tag format, file type and size, group size 2–20, course-only visibility needs a course.</li>
 <li><b>Keys</b>: 12 primary keys (4 composite), 15 foreign keys with deliberate <code>CASCADE</code> / <code>SET NULL</code> actions,
 unique constraints (course code, tag name, group name per course, chunk position) and a case-insensitive unique index on e-mail.</li>
-<li><b>Triggers</b> normalise input (names, e-mails, tags) before CHECKs run and enforce cross-table rules a CHECK cannot express (§10.6).</li>
+<li><b>Triggers</b> normalise input (names, e-mails, tags) before CHECKs run and enforce cross-table rules a CHECK cannot express (§5.9).</li>
 <li>The API validates the same rules first (zod) for friendly field messages; the database is the final authority.</li>
 </ul>
 
-<h3>10.3 Indexes</h3>
+<h3 id="s5-6">5.6 Indexes</h3>
 <p>34 indexes: B-tree (keys, foreign keys, composite), GIN for full text, HNSW for vectors, partial indexes for the public feed and the
-embedding work queue, and expression indexes on <code>LOWER(email)</code> and <code>LOWER(query_text)</code>. Q16 in §13 shows the
+embedding work queue, and expression indexes on <code>LOWER(email)</code> and <code>LOWER(query_text)</code>. Q16 in §5.12 shows the
 planner using the B-tree, GIN and HNSW indexes.</p>
 """
 
 SQL_SECTION_REST = """
-<h3>10.4 Views and materialized view</h3>
+<h3 id="s5-7">5.7 Views and materialized view</h3>
 <table class="grid compact"><thead><tr><th>View</th><th>Purpose</th></tr></thead><tbody>
 <tr><td><code>v_document_catalog</code></td><td>Document + owner + course + tag array + bookmark and chunk counts (LATERAL sub-queries) — the base of every listing and search result</td></tr>
 <tr><td><code>v_group_overview</code></td><td>Group + course + live member count and seats left (GROUP BY)</td></tr>
@@ -191,7 +227,7 @@ SQL_SECTION_REST = """
 <code>REFRESH … CONCURRENTLY</code> through the SECURITY DEFINER function <code>fn_refresh_course_stats()</code></td></tr>
 </tbody></table>
 
-<h3>10.5 Stored functions and procedures</h3>
+<h3 id="s5-8">5.8 Stored functions and procedures</h3>
 <table class="grid compact"><thead><tr><th>Routine</th><th>Kind</th><th>What it does</th></tr></thead><tbody>
 <tr><td><code>fn_visible_doc_ids(student)</code></td><td>SQL, set-returning</td><td>The single access rule: public, own, course-only if enrolled, everything for admins</td></tr>
 <tr><td><code>fn_can_view_document(student, doc)</code></td><td>SQL, boolean</td><td>Point check built on the function above</td></tr>
@@ -211,7 +247,7 @@ SQL_SECTION_REST = """
 <p>Custom error codes (<code>SM001</code> group full, <code>SM002</code> not enrolled, <code>SM003</code> last admin, <code>SM004</code>
 capacity below members, <code>SM404</code>, <code>SM409</code>) are mapped by the API to HTTP 409/403/404 with the database's message.</p>
 
-<h3>10.6 Triggers</h3>
+<h3 id="s5-9">5.9 Triggers</h3>
 <table class="grid compact"><thead><tr><th>#</th><th>Trigger</th><th>Event</th><th>Rule enforced</th></tr></thead><tbody>
 <tr><td>T1</td><td><code>trg_student_normalize</code></td><td>BEFORE INSERT/UPDATE · STUDENT</td><td>Trim name, lower-case e-mail</td></tr>
 <tr><td>T2</td><td><code>trg_tag_normalize</code></td><td>BEFORE INSERT/UPDATE · TAG</td><td>"Query Tuning " → <code>query-tuning</code></td></tr>
@@ -226,13 +262,13 @@ capacity below members, <code>SM404</code>, <code>SM409</code>) are mapped by th
 <tr><td>T11</td><td><code>trg_audit_student/document/course/group</code></td><td>AFTER INSERT/UPDATE/DELETE</td><td>Append JSONB before/after images and the acting user to AUDIT_LOG (password and content stripped)</td></tr>
 </tbody></table>
 
-<h3>10.7 Transactions and concurrency</h3>
+<h3 id="s5-10">5.10 Transactions and concurrency</h3>
 <ul>
 <li><b>Upload</b>: <code>BEGIN</code> → insert DOCUMENT (T4 writes chunks) → upsert tags → link tags → <code>COMMIT</code>. Any failure
 rolls everything back and the API deletes the stored file, so no orphan rows or files remain.</li>
 <li><b>Join a group</b>: <code>CALL sp_join_group</code> locks the group row with <code>SELECT … FOR UPDATE</code>. Two students racing for
 the last seat are serialised — one succeeds, the other receives SM001. This is proven by an automated test that opens two
-connections and runs both joins at the same time (§16).</li>
+connections and runs both joins at the same time (§9.2).</li>
 <li><b>Leaving and member changes</b>: <code>CALL sp_leave_group</code>, and the promote/remove endpoints, lock the same group row
 first. Without it, the last two members leaving at the same instant could each see the other still present and leave an empty
 group with no admin; with it the second leave sees the first and deletes the group (also proven by a two-connection test).</li>
@@ -241,7 +277,7 @@ local to the transaction, so the audit trigger always records the right user eve
 <li>All writes that change several rows (admin role changes, deleting courses or users, leaving groups) run inside <code>withTransaction()</code>.</li>
 </ul>
 
-<h3>10.8 Database security</h3>
+<h3 id="s5-11">5.11 Database security — GRANT and REVOKE</h3>
 <ul>
 <li>Two logins: <code>postgres</code> (owner, used only by the setup script) and <code>scholarmesh_app</code> (used by the web app) with
 <code>SELECT/INSERT/UPDATE/DELETE</code> + <code>EXECUTE</code> only — it cannot create, alter or drop objects (tested: error 42501).</li>
@@ -252,7 +288,7 @@ local to the transaction, so the audit trigger always records the right user eve
 """
 
 ADVANCED = """
-<h2 id="s12">12. Advanced database features — summary</h2>
+<h3 id="s5-13">5.13 Advanced database features — summary</h3>
 <table class="grid"><thead><tr><th>Feature (brief requires ≥ 4)</th><th>Where</th><th>Used by the app for</th></tr></thead><tbody>
 <tr><td>Transactions</td><td><code>withTransaction()</code>, procedures, savepoints in tests</td><td>Upload, joins, admin changes; race-safe seats</td></tr>
 <tr><td>Views</td><td>4 views</td><td>Catalogue, group overview, centroids, interest profiles</td></tr>
@@ -268,19 +304,22 @@ ADVANCED = """
 </tbody></table>
 """
 
-QUERY_PICKS = [
+SQL_QUERY_PICKS = [
     ("Q1", "JOIN across four tables, GROUP BY, ORDER BY"),
     ("Q2", "GROUP BY + HAVING with aggregate functions"),
     ("Q4", "Correlated subquery with NOT EXISTS"),
     ("Q5", "CTE + scalar subqueries"),
     ("Q6", "Window function RANK() OVER (PARTITION BY …)"),
     ("Q10", "Full-text search"),
-    ("Q11", "Vector similarity search"),
-    ("Q12", "Hybrid search (Reciprocal Rank Fusion)"),
-    ("Q13", "Study-group and partner matching"),
     ("Q14", "INSERT, UPDATE, DELETE, INSERT … SELECT inside a transaction, then ROLLBACK"),
     ("Q15", "Stored procedure + trigger rejecting a full group"),
     ("Q16", "EXPLAIN ANALYZE — indexes in use"),
+]
+
+VECTOR_QUERY_PICKS = [
+    ("Q11", "Vector similarity search"),
+    ("Q12", "Hybrid search (Reciprocal Rank Fusion)"),
+    ("Q13", "Study-group and partner matching"),
 ]
 
 
@@ -289,15 +328,13 @@ def split_blocks(text, marker):
     return {parts[i]: parts[i + 1] for i in range(1, len(parts) - 1, 2)}
 
 
-def important_queries():
+def important_queries(picks):
     sql = (ROOT / "db" / "10_important_queries.sql").read_text(encoding="utf-8")
     output = (DATA / "queries-output.txt").read_text(encoding="utf-8")
     sql_blocks = split_blocks(sql, r"\\echo '\\n=== ")
     out_blocks = split_blocks(output, "=== ")
-    parts = ['<h2 id="s13">13. Important queries</h2>',
-             '<p>From <code>db/10_important_queries.sql</code>, executed against the seeded database; the output below is the '
-             'real psql output (long results trimmed). Data changes run inside <code>BEGIN … ROLLBACK</code>.</p>']
-    for qid, label in QUERY_PICKS:
+    parts = []
+    for qid, label in picks:
         q_sql = sql_blocks.get(qid, "")
         q_sql = "\n".join(line for line in q_sql.splitlines()[1:] if not line.startswith("\\echo")).strip()
         q_out = "\n".join(out_blocks.get(qid, "").splitlines()[1:]).strip()
@@ -309,22 +346,167 @@ def important_queries():
     return "\n".join(parts)
 
 
-API = """
+QUERIES_NOTE = ('<p>From <code>db/10_important_queries.sql</code>, executed against the seeded database; the output below each '
+                'query is the real psql output (long results trimmed). Data changes run inside <code>BEGIN … ROLLBACK</code>.</p>')
+
+
+def sql_queries():
+    return ('<h3 id="s5-12">5.12 DML and important queries — with real output</h3>' + QUERIES_NOTE
+            + important_queries(SQL_QUERY_PICKS))
+
+
+# ------------------------------------------------------------------ 6 NoSQL / vector database commands
+# (title, why, file, first line containing, last line matching)
+VECTOR_COMMANDS = [
+    ("Enable the vector extension", "Adds the <code>vector</code> type, the distance operators and the HNSW index method.",
+     "db/02_phase2_alter.sql", "CREATE EXTENSION IF NOT EXISTS vector", None),
+    ("Store vectors next to the relational data", "Every passage of a note gets a 384-number embedding. <code>doc_id</code> is a "
+     "real foreign key, so deleting a note deletes its vectors in the same transaction.",
+     "db/02_phase2_alter.sql", "CREATE TABLE DOC_CHUNK", r"^\);"),
+    ("Keep the vector of every search", "Used to build each student's interest profile.",
+     "db/02_phase2_alter.sql", "ALTER TABLE SEARCH_LOG", r";\s*$"),
+    ("Index the vectors — HNSW with cosine distance", "A navigable graph index: nearest neighbours are found without "
+     "comparing the question with every stored vector.",
+     "db/02_phase2_alter.sql", "CREATE INDEX idx_chunk_embedding_hnsw", r";\s*$"),
+    ("Write embeddings with one set-based UPDATE", "The API computes all of a note's vectors and stores them in one statement; "
+     "<code>unnest</code> pairs each chunk id with its vector.",
+     "web/src/lib/repos/embedding-jobs.ts", "// one set-based UPDATE", r"^\s*\);"),
+    ("Nearest-neighbour search (k-NN)", "<code>ORDER BY embedding &lt;=&gt; query</code> uses the HNSW index; the best passage "
+     "per note is kept and weak matches (similarity below 0.28) are dropped.",
+     "db/04_functions.sql", "CREATE OR REPLACE FUNCTION fn_semantic_search", r"^\$\$;"),
+    ("Aggregate vectors — one centroid per note", "pgvector's <code>AVG</code> turns a note's passage vectors into one vector, "
+     "used for “more like this” and interest profiles.",
+     "db/03_views.sql", "CREATE VIEW v_doc_centroid", r";\s*$"),
+    ("Semi-structured JSONB documents", "The audit log keeps a schema-less copy of each changed row, before and after.",
+     "db/02_phase2_alter.sql", "CREATE TABLE AUDIT_LOG", r"^\);"),
+    ("Build and read JSONB inside a trigger", "<code>to_jsonb</code> turns a row into a document, <code>-</code> removes "
+     "secret keys, <code>-&gt;&gt;</code> reads one field.",
+     "db/05_triggers.sql", "IF TG_OP <> 'INSERT'", r"v_pk :="),
+]
+
+
+def vector_commands():
+    parts = ['<h3 id="s6-2">6.2 pgvector and JSONB commands</h3>',
+             '<p>Taken directly from the project files (file name and line numbers shown).</p>']
+    for i, (title, why, path, start, end) in enumerate(VECTOR_COMMANDS, start=1):
+        parts.append(f'<div class="cmd"><h4>V{i} — {esc(title)}</h4><p>{why}</p>{code_window(path, start, end)}</div>')
+    parts.append('<h3 id="s6-3">6.3 Vector queries on the real data — with output</h3>' + QUERIES_NOTE
+                 + important_queries(VECTOR_QUERY_PICKS))
+    return "\n".join(parts)
+
+
+# ------------------------------------------------------------------ 7 Next.js project tree
+TREE_NOTES = {
+    "db": "SQL, run in order by npm run db:setup (§5)",
+    "docs": "report, guide, diagrams, screenshots, demo video",
+    "web": "the Next.js application",
+    "docker-compose.yml": "PostgreSQL 17 + pgvector container",
+    ".env.example": "database passwords template (real .env is git-ignored)",
+    "README.md": "setup, demo logins, tests",
+    "web/public": "static files",
+    "web/scripts": "database setup, embedding job, screenshots, demo video, PDF rendering",
+    "web/src": "application source",
+    "web/src/app": "App Router: folders are URLs",
+    "web/src/app/(app)": "pages for signed-in users (shared layout + navigation)",
+    "web/src/app/(app)/admin": "admin role only",
+    "web/src/app/(auth)": "login and registration pages",
+    "web/src/app/api": "REST API (route handlers): the only path to the database",
+    "web/src/app/layout.tsx": "root layout: fonts, metadata",
+    "web/src/app/page.tsx": "landing page  /",
+    "web/src/components": "shared React components",
+    "web/src/lib": "server-side logic",
+    "web/src/lib/auth": "bcrypt passwords, JWT sessions, current user",
+    "web/src/lib/repos": "all SQL used by the app (parameterised)",
+    "web/src/lib/db.ts": "connection pool, query(), withTransaction()",
+    "web/src/lib/embeddings.ts": "local embedding model (384-d)",
+    "web/src/lib/files.ts": "upload storage, PDF/text extraction",
+    "web/src/lib/http.ts": "JSON responses, error mapping, CSRF check",
+    "web/src/lib/validation.ts": "zod schemas for every request",
+    "web/src/proxy.ts": "first gate: signed session cookie",
+    "web/tests": "Vitest + Playwright",
+    "web/tests/unit": "unit tests",
+    "web/tests/db": "database integration tests (rolled back)",
+    "web/tests/e2e": "end-to-end browser tests",
+    "web/next.config.ts": "Next.js settings, security headers",
+    "web/.env.example": "DATABASE_URL + AUTH_SECRET template",
+}
+TREE_COLLAPSED = {"web/public", "docs"}
+
+
+def route_of(path):
+    """URL served by a page.tsx / route.ts file (route groups such as (app) are not part of the URL)."""
+    parts = [p for p in path.split("/")[3:-1] if not p.startswith("(")]
+    url = "/" + "/".join(p.replace("[", ":").replace("]", "") for p in parts)
+    return url
+
+
+def project_tree():
+    files = subprocess.run(["git", "ls-files", "db", "docs", "web", "docker-compose.yml", ".env.example", "README.md"],
+                           cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
+    tree = {}  # directory -> dict of children; file -> None
+    for f in files:
+        parts = f.split("/")
+        node, path = tree, ""
+        for depth, part in enumerate(parts):
+            path = f"{path}/{part}" if path else part
+            if depth == len(parts) - 1:
+                node[part] = None
+                break
+            node = node.setdefault(part, {})
+            if path in TREE_COLLAPSED:
+                break
+    lines = ['<span class="d">DBMS-Mini-Project/</span>']
+
+    def walk(node, path, indent):
+        entries = sorted(node.items(), key=lambda kv: (kv[1] is None, kv[0].lower()))
+        for i, (name, child) in enumerate(entries):
+            last = i == len(entries) - 1
+            full = f"{path}/{name}" if path else name
+            label = f'<span class="d">{esc(name)}/</span>' if child is not None else esc(name)
+            note = TREE_NOTES.get(full)
+            if note is None and full.startswith("web/src/app/") and name in ("page.tsx", "route.ts"):
+                note = route_of(full)
+            width = len(indent) + 4 + len(name) + (1 if child is not None else 0)
+            comment = f'{" " * max(2, 50 - width)}<span class="c"># {esc(note)}</span>' if note else ""
+            lines.append(f"{indent}{'└── ' if last else '├── '}{label}{comment}")
+            if child and full not in TREE_COLLAPSED:
+                walk(child, full, indent + ("    " if last else "│   "))
+
+    walk(tree, "", "")
+    return "\n".join(lines)
+
+
+def nextjs_section():
+    return f"""
+<h2 id="s7">7. Next.js — Project tree structure</h2>
+<p>The application lives in <code>web/</code> and uses the Next.js <b>App Router</b>: every folder under <code>src/app</code> is a
+URL, a <code>page.tsx</code> file is a page and a <code>route.ts</code> file is an API endpoint. Folders in brackets such as
+<code>(app)</code> group pages under a shared layout without becoming part of the URL; <code>[id]</code> is a URL parameter.
+The tree below is generated from the repository (<code>git ls-files</code>); the comment beside each page or route is the URL it serves.</p>
+<h3 id="s7-1">7.1 Project tree</h3>
+<pre class="tree">{project_tree()}</pre>
+"""
+
+
+ARCH = """
 <div class="landscape">
-<h2 id="s14">14. System architecture</h2>
+<h3 id="s7-2">7.2 How the parts connect — architecture</h3>
 <figure class="wide">{svg}<figcaption>Figure 2 — Architecture. The browser never talks to the database; every read and write goes
 through server code that re-checks the user and uses parameterised SQL.</figcaption></figure>
 </div>
-<h3>Request flow (example: a semantic search)</h3>
+"""
+
+API_REST = """
+<h3 id="s7-3">7.3 Request flow (example: a semantic search)</h3>
 <ol>
 <li>The browser calls <code>GET /api/search?q=…&amp;mode=semantic</code> with the session cookie.</li>
 <li><code>proxy.ts</code> only checks that a validly signed cookie exists; the route handler re-reads the user from STUDENT (role, is_active) and validates the query with zod — so deactivation, deletion and promotion take effect immediately.</li>
 <li>The server embeds the question with the local model (cached for repeated questions).</li>
 <li>One SQL statement calls <code>fn_semantic_search</code>, which applies <code>fn_visible_doc_ids</code> and the HNSW index, and joins
 <code>v_document_catalog</code> for display fields.</li>
-<li>The query and its vector are written to SEARCH_LOG (analytics and interest profile); results return as <code>{{ ok, data }}</code>.</li>
+<li>The query and its vector are written to SEARCH_LOG (analytics and interest profile); results return as <code>{ ok, data }</code>.</li>
 </ol>
-<h3>API endpoints (34 handlers in 22 routes)</h3>
+<h3 id="s7-4">7.4 API endpoints (34 handlers in 22 routes)</h3>
 <table class="grid compact"><thead><tr><th>Endpoint</th><th>Methods</th><th>Who</th><th>Purpose</th></tr></thead><tbody>
 <tr><td><code>/api/auth/register</code>, <code>/login</code>, <code>/logout</code></td><td>POST</td><td>public / any</td><td>Account and session (rate-limited)</td></tr>
 <tr><td><code>/api/search</code></td><td>GET</td><td>signed in</td><td>Keyword / semantic / hybrid search with filters</td></tr>
@@ -340,7 +522,7 @@ through server code that re-checks the user and uses parameterised SQL.</figcapt
 <tr><td><code>/api/admin/users/:id</code></td><td>PATCH, DELETE</td><td>admin</td><td>Role, activation, deletion (not self)</td></tr>
 <tr><td><code>/api/admin/courses</code>, <code>/courses/:id</code>, <code>/tags/merge</code></td><td>POST · PATCH, DELETE · POST</td><td>admin</td><td>Course catalogue; tag merge</td></tr>
 </tbody></table>
-<h3>Application security</h3>
+<h3 id="s7-5">7.5 Application security</h3>
 <ul>
 <li>bcrypt password hashes; constant-cost login (a dummy hash is checked for unknown e-mails); 10 attempts per 15 minutes per account, plus per-IP limits when a trusted reverse proxy supplies the address (a client-sent <code>X-Forwarded-For</code> is never trusted).</li>
 <li>Session: HS256 JWT in an <code>httpOnly</code>, <code>SameSite=Lax</code> cookie (<code>Secure</code> in production); role and active flag re-read from the database on every request.</li>
@@ -374,12 +556,42 @@ SHOTS = [
 ]
 
 
-def screenshots():
-    parts = ['<h2 id="s15">15. Application screenshots</h2>',
-             '<p>Captured automatically from the production build by <code>web/scripts/screenshots.ts</code> (Playwright, 1440 px wide).</p>']
-    for i, (name, caption) in enumerate(SHOTS, start=3):
+# (caption, file, first line containing, last line matching)
+CODE_SHOTS = [
+    ("proxy.ts — the first gate: a page or API request without a valid signed session cookie is turned away "
+     "before any page code runs.", "web/src/proxy.ts", "const PUBLIC_API", r"^}$"),
+    ("Route handler for GET /api/search — the API layer: it re-reads the signed-in user, validates the request with zod "
+     "and calls the search repository.", "web/src/app/api/search/route.ts", "// GET /api/search", r"^}\);"),
+    ("Search repository — embeds the question, runs one stored search function in PostgreSQL and logs the search "
+     "together with its vector.", "web/src/lib/repos/search.ts", "export async function runSearch", r"^}$"),
+    ("Transactions — BEGIN … COMMIT on one pooled connection, ROLLBACK on any error; the acting user is handed to the "
+     "audit trigger.", "web/src/lib/db.ts", "export async function withTransaction", r"^}$"),
+    ("Upload — the note is inserted and its tags linked in one transaction; trigger T4 splits the text into passages.",
+     "web/src/lib/repos/documents.ts", "export async function createDocument", r"^}$"),
+    ("React client component (search page) — calls the API, ignores out-of-date responses and keeps the URL shareable.",
+     "web/src/app/(app)/search/search-client.tsx", "async function run(next", r"^  }$"),
+]
+
+
+def code_and_demo():
+    parts = ['<h2 id="s8">8. Sample screenshots — application code and demo</h2>',
+             '<h3 id="s8-1">8.1 Application code</h3>',
+             '<p>Excerpts of the real source files (file name and line numbers as in the repository), following one request '
+             'from the browser to the database: the gate, the API route, the repository that runs the SQL, the transaction '
+             'helper, the upload transaction and the React component that calls the API.</p>']
+    figure = 3
+    for caption, path, start, end in CODE_SHOTS:
+        parts.append(f'<figure class="code-shot">{code_window(path, start, end)}'
+                     f'<figcaption>Figure {figure} — {esc(caption)}</figcaption></figure>')
+        figure += 1
+    parts += ['<h3 id="s8-2">8.2 Application demo</h3>',
+              '<p>Captured automatically from the production build by <code>web/scripts/screenshots.ts</code> (Playwright, '
+              '1440 px wide). A narrated <b>demo video</b> of the same flows (4 min 47 s, 1080p, with chapters) is in the '
+              'repository at <code>docs/demo/ScholarMesh_Demo.mp4</code>, with its script in <code>docs/demo/demo-script.md</code>.</p>']
+    for name, caption in SHOTS:
         parts.append(f'<figure class="shot"><img src="../screenshots/{name}.png" alt="{esc(caption)}"/>'
-                     f'<figcaption>Figure {i} — {esc(caption)}</figcaption></figure>')
+                     f'<figcaption>Figure {figure} — {esc(caption)}</figcaption></figure>')
+        figure += 1
     return "\n".join(parts)
 
 
@@ -413,7 +625,7 @@ def testing():
         f'<tr><td>{i}</td><td>{esc(layer)}</td><td>{esc(name)}</td><td class="{"ok" if st == "passed" else "bad"}">{esc(st)}</td></tr>'
         for i, (layer, _file, name, st) in enumerate(rows, start=1))
     return f"""
-<h2 id="s16">16. Testing</h2>
+<h3 id="s9-2">9.2 Test cases and results</h3>
 <div class="cover-stats small">
   <div><b>{passed}/{len(rows)}</b><span>tests passed</span></div>
   <div><b>{unit}</b><span>unit</span></div>
@@ -432,41 +644,74 @@ upload and delete, the full-group rule, admin-only pages.</li>
 <li>Also checked: TypeScript strict type-check, ESLint, production build, and the SQL demonstration script (only the intended "group is full" error).</li>
 <li><b>Independent code and security review</b> of the finished code: 15 distinct findings (redirect loop for stale sessions, private-note metadata in tag
 counts and recommendations, a leave race, upload limits, rate-limit spoofing, open redirect, …). All were fixed and covered by new tests,
-except open self-enrollment, which is documented as a limitation (§3).</li>
+except open self-enrollment, which is documented as a limitation (§3.3).</li>
 </ul>
 <p>Commands: <code>npm test</code>, <code>npm run test:e2e</code>, <code>npm run typecheck</code>, <code>npm run lint</code> (in <code>web/</code>).</p>
 <table class="grid compact tests"><thead><tr><th>#</th><th>Layer</th><th>Test case</th><th>Result</th></tr></thead><tbody>{table}</tbody></table>
 """
 
 
-COVERAGE = """
-<h2 id="s17">17. Requirement coverage</h2>
-<table class="grid compact"><thead><tr><th>Requirement (project brief)</th><th>Evidence</th></tr></thead><tbody>
-<tr><td>Meaningful problem, beyond CRUD</td><td>§1; semantic retrieval, matching, DB-enforced rules</td></tr>
-<tr><td>SQL + vector database (Option 2), justified</td><td>PostgreSQL 17 + pgvector; §8</td></tr>
-<tr><td>ER diagram → relational schema; entities, attributes, PK, FK, relationships, constraints</td><td>§6, §7, §9</td></tr>
-<tr><td>Vector component: data model, embeddings, metadata, indexes, retrieval strategy</td><td>§11</td></tr>
-<tr><td>DDL: CREATE, ALTER, DROP, keys, constraints, indexes, views</td><td>§10.1–10.4, <code>db/01–03</code></td></tr>
-<tr><td>DML: INSERT, UPDATE, DELETE, SELECT with JOIN, GROUP BY, HAVING, ORDER BY, aggregates, subqueries</td><td>§13 Q1–Q14; the app's repositories</td></tr>
-<tr><td>≥ 4 advanced features</td><td>§12 (11 listed)</td></tr>
-<tr><td>Next.js interface with forms, tables, search, filtering, dashboards</td><td>§15</td></tr>
-<tr><td>Backend/API layer; no hard-coded credentials; environment variables</td><td>§14; <code>.env.example</code> files</td></tr>
-<tr><td>Authentication and ≥ 2 roles</td><td>student / admin (+ group admin / member); §4</td></tr>
-<tr><td>Validation at database level; consistency and integrity</td><td>§10.2, §10.6, §10.7; tests in §16</td></tr>
-<tr><td>Security: no plain-text passwords or credentials</td><td>bcrypt + CHECK; §10.8, §14</td></tr>
-<tr><td>Documentation, testing results, screenshots</td><td>This report; README</td></tr>
-<tr><td>Git/GitHub with individual commits; README</td><td>§18; <code>README.md</code></td></tr>
-</tbody></table>
+# (group, rubric item, done?, where in this report / note)
+RUBRIC = [
+    ("Evaluation / demonstration (project brief)", "Problem statement and motivation", True, "§3.1"),
+    ("Evaluation / demonstration (project brief)", "ER diagram and database design", True, "§5.2; design choices §4.1"),
+    ("Evaluation / demonstration (project brief)", "Relational schema", True, "§5.3; data dictionary in Appendix A"),
+    ("Evaluation / demonstration (project brief)", "Database implementation", True, "§5.4–§5.11, §6.2"),
+    ("Evaluation / demonstration (project brief)", "Important queries / operations", True, "§5.12 (SQL), §6.3 (vector), with real output"),
+    ("Evaluation / demonstration (project brief)", "Next.js interface", True, "§7, §8.2; demo video"),
+    ("Evaluation / demonstration (project brief)", "Database integration", True, "§7.2–§7.4, §8.1"),
+    ("Evaluation / demonstration (project brief)", "Advanced database features (at least 4)", True, "§5.13 — 11 features"),
+    ("Evaluation / demonstration (project brief)", "Test cases", True, "§9.2 — __TESTS_PASSED__ of __TOTAL_TESTS__ passing"),
+    ("Evaluation / demonstration (project brief)", "Individual contribution of team members", True, "§9.3"),
+    ("Technical requirements", "SQL + vector database (Option 2), choice justified per kind of data", True, "§4.1"),
+    ("Technical requirements", "Vector component: data model, embeddings, indexes, retrieval strategy", True, "§6"),
+    ("Technical requirements", "DDL: CREATE, ALTER, DROP, keys, constraints, indexes, views", True, "§5.4–§5.7"),
+    ("Technical requirements", "DML: INSERT, UPDATE, DELETE, SELECT with JOIN, GROUP BY, HAVING, ORDER BY, aggregates, subqueries", True, "§5.12"),
+    ("Technical requirements", "Backend / API layer (Next.js Route Handlers)", True, "§7.3–§7.4, §8.1"),
+    ("Technical requirements", "Authentication and at least 2 roles", True, "student / admin (+ group admin / member); §3.4, §7.5"),
+    ("Technical requirements", "Validation and integrity at database level", True, "§5.5, §5.9, §5.10"),
+    ("Technical requirements", "Security: no plain-text passwords, credentials only in environment variables", True, "§5.11, §7.5"),
+    ("Level 3 expectations", "Beyond CRUD: clear link between concepts, design, implementation and the app", True, "§3.1, §6, §8.1"),
+    ("Level 3 expectations", "Original problem, database design and implementation", True, "§3"),
+    ("Deliverables", "Documentation: report, README, setup guide, screenshots, demo video", True, "this report; Appendix B; §8.2"),
+    ("Deliverables", "Git + GitHub repository with README", True, "github.com/Darshanpawar7/DBMS-Mini-Project"),
+    ("Deliverables", "Individual commits from each member's own GitHub account", False,
+     "Pending — all commits so far are from Darshan's account; Dhanush V Biradar to push his own commits"),
+]
+
+
+def rubric():
+    done = sum(1 for r in RUBRIC if r[2])
+    rows, group = [], None
+    for i, (grp, item, ok, where) in enumerate(RUBRIC, start=1):
+        if grp != group:
+            rows.append(f'<tr class="group"><td colspan="4">{esc(grp)}</td></tr>')
+            group = grp
+        status = '<td class="ok">✓ Complete</td>' if ok else '<td class="pending">Pending</td>'
+        rows.append(f"<tr><td>{i}</td><td>{esc(item)}</td>{status}<td>{esc(where)}</td></tr>")
+    return f"""
+<h2 id="s9">9. Evaluation rubrics — completion status</h2>
+<p>Every item the project brief evaluates, with its status and where the evidence is in this report.</p>
+<h3 id="s9-1">9.1 Rubric checklist</h3>
+<div class="cover-stats small rubric-stats">
+  <div><b>{done}/{len(RUBRIC)}</b><span>items complete</span></div>
+  <div><b>{len(RUBRIC) - done}</b><span>pending</span></div>
+  <div><b>__TESTS_PASSED__</b><span>tests passing</span></div>
+  <div><b>11</b><span>advanced DB features</span></div>
+</div>
+<table class="grid compact rubric"><thead><tr><th>#</th><th>Rubric item</th><th>Status</th><th>Evidence in this report</th></tr></thead>
+<tbody>{"".join(rows)}</tbody></table>
 """
 
+
 CONTRIB = """
-<h2 id="s18">18. Individual contributions and version control</h2>
+<h3 id="s9-3">9.3 Individual contributions</h3>
 <p>Both members worked on the database and on the application, as the brief requires. Each owned one end-to-end
 slice — <b>notes and search</b> (Darshan) and <b>people, groups and administration</b> (Dhanush) — and reviewed the other's work.</p>
 <table class="grid"><thead><tr><th style="width:22%">Member</th><th>Database work</th><th>Application work</th></tr></thead><tbody>
 <tr><td><b>Darshan P Pawar</b><br/>PES2UG24CS143</td>
 <td><ul>
-<li>Phase 1 ER diagram, schema and DDL; Phase 1 review and fixes (§5)</li>
+<li>Phase 1 ER diagram, schema and DDL; Phase 1 review and fixes (§5.1)</li>
 <li>Phase 2 schema evolution (<code>ALTER</code>s, DOC_CHUNK, AUDIT_LOG, CHECK constraints, indexes)</li>
 <li>pgvector set-up, HNSW and GIN indexes, chunking function and document triggers (T3, T4)</li>
 <li>Keyword, semantic and hybrid search functions; similarity threshold calibration</li>
@@ -484,7 +729,7 @@ slice — <b>notes and search</b> (Darshan) and <b>people, groups and administra
 <li>Study-group triggers (seat limit, creator admin, succession, guards) and procedures <code>sp_join_group</code>, <code>sp_leave_group</code>, <code>sp_merge_tags</code></li>
 <li>Recommendation functions (groups and partners)</li>
 <li>Audit trigger, least-privilege app role and grants</li>
-<li>Important-queries script (§13) and EXPLAIN analysis</li>
+<li>Important-queries script (§5.12, §6.3) and EXPLAIN analysis</li>
 </ul></td>
 <td><ul>
 <li>Authentication, sessions, roles and the proxy gate; security hardening</li>
@@ -494,12 +739,12 @@ slice — <b>notes and search</b> (Darshan) and <b>people, groups and administra
 </ul></td></tr>
 </tbody></table>
 <p>Repository: <code>https://github.com/Darshanpawar7/DBMS-Mini-Project</code>. It contains <code>db/</code> (SQL), <code>web/</code> (Next.js app and tests) and <code>docs/</code> (this report, diagrams,
-screenshots). Each member commits their own work from their own GitHub account (feature branches merged by pull request), so the history
-shows individual contributions. Setup and run instructions are in <code>README.md</code>.</p>
+screenshots, demo video). Each member is to commit their own work from their own GitHub account, so that the history shows
+individual contributions (current status in §9.1). Setup and run instructions are in <code>README.md</code> and Appendix B.</p>
 """
 
 APPENDIX = """
-<h2 id="sA">Appendix A — Running the project</h2>
+<h2 id="sB">Appendix B — Running the project</h2>
 <pre class="code">cp .env.example .env                 # choose database passwords
 docker compose up -d                 # PostgreSQL 17 + pgvector on port 5433
 cd web && cp .env.example .env.local # DATABASE_URL (app password) + AUTH_SECRET
@@ -568,41 +813,85 @@ table.grid td li { margin: 1px 0; }
 .cover-stats span { font-size: 8.5pt; color: #475569; }
 .todo { background: #fef3c7; color: #92400e; padding: 0 4px; border-radius: 3px; }
 .todo-block { background: #fef3c7; color: #92400e; padding: 6px 10px; border-radius: 6px; }
-nav.toc ol { columns: 2; font-size: 10pt; }
-nav.toc a { color: #312e81; text-decoration: none; }
+table.toc td { padding: 6px 8px; }
+table.toc td:first-child { width: 9mm; font-weight: 700; color: #4f46e5; text-align: center; }
+table.toc td:nth-child(2) { width: 62mm; font-weight: 600; }
+table.toc a { color: #1e1b4b; text-decoration: none; }
+table.toc td:last-child { color: #475569; font-size: 9.2pt; }
+table.students { width: 120mm; font-size: 12pt; margin: 0 0 22px; }
+table.students th { font-size: 10pt; }
+.abstract { font-size: 11pt; text-align: justify; line-height: 1.6; }
+.keywords { color: #475569; font-size: 9.5pt; margin-top: 10px; }
+pre.tree { background: #f8fafc; border: 1px solid #e2e8f0; font-size: 7.7pt; line-height: 1.3; white-space: pre; break-inside: auto; }
+pre.tree .d { color: #312e81; font-weight: 700; }
+pre.tree .c { color: #64748b; }
+.window { border: 1px solid #1e293b; border-radius: 8px; overflow: hidden; background: #0d1117; margin: 6px 0 4px; text-align: left; }
+.window .bar { background: #1e293b; color: #cbd5e1; font: 8pt Consolas, "Cascadia Mono", monospace; padding: 5px 10px; }
+.window .bar i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.window .bar span { margin-left: 6px; }
+.window .highlight { background: #0d1117; }
+.window pre { margin: 0; border-radius: 0; background: #0d1117; color: #e6edf3; font-size: 7.9pt; }
+figure.code-shot { text-align: left; }
+.cmd { break-inside: avoid; }
+.cmd p { margin: 2px 0 4px; }
+table.rubric tr.group td { background: #f1f5f9; font-weight: 700; color: #312e81; }
+td.pending { color: #b45309; font-weight: 700; }
+table.rubric td:nth-child(3) { white-space: nowrap; }
+.rubric-stats { margin-top: 4px; }
 """
 
+# 1 and 2 are on the cover page; 3-9 are the numbered sections
 TOC = [
-    ("s1", "Problem statement and motivation"), ("s2", "Objectives"), ("s3", "Scope"),
-    ("s4", "Users, roles and functional requirements"), ("s5", "Phase 1 review — issues found and fixed"),
-    ("s6", "Entity–relationship diagram"), ("s7", "ER-to-relational mapping and relational schema"),
-    ("s8", "Database choice and justification"), ("s9", "Data dictionary"), ("s10", "SQL implementation"),
-    ("s11", "Vector database and semantic search"), ("s12", "Advanced database features — summary"),
-    ("s13", "Important queries"), ("s14", "System architecture, API and security"), ("s15", "Application screenshots"),
-    ("s16", "Testing"), ("s17", "Requirement coverage"), ("s18", "Individual contributions and version control"),
-    ("s19", "Conclusion and future enhancements"),
+    ("1", "cover", "Title", "Project title and subtitle — cover page"),
+    ("2", "cover", "Students' SRN and name", "Team table — cover page"),
+    ("3", "s3", "Abstract", "Abstract; problem statement, objectives, scope, users and roles"),
+    ("4", "s4", "Tech stack", "Technologies and versions; why SQL plus a vector database"),
+    ("5", "s5", "SQL — Database commands", "Phase 1 fixes, ER diagram, relational schema, CREATE / ALTER / DROP, constraints, "
+     "indexes, views, functions, procedures, triggers, transactions, GRANT / REVOKE, DML queries with output"),
+    ("6", "s6", "NoSQL / Vector database commands", "Vector data model, pgvector and JSONB commands, vector queries with output, "
+     "similarity cut-off, hybrid search, group matching"),
+    ("7", "s7", "Next.js — Project tree structure", "Annotated project tree, architecture, request flow, API endpoints, security"),
+    ("8", "s8", "Sample screenshots — application code and demo", "6 code excerpts, 17 application screenshots, demo video"),
+    ("9", "s9", "Evaluation rubrics — completion status", "Rubric checklist, test results, individual contributions, conclusion"),
+    ("A", "sA", "Appendix A — Data dictionary", "Every table and column, generated from the database catalog"),
+    ("B", "sB", "Appendix B — Running the project", "Setup commands and demo logins"),
 ]
 
 
 def main():
     er_svg = (HERE / "er-diagram.svg").read_text(encoding="utf-8")
     arch_svg = (HERE / "architecture.svg").read_text(encoding="utf-8")
-    toc = "".join(f'<li><a href="#{sid}">{esc(title)}</a></li>' for sid, title in TOC)
+    toc = "".join(f'<tr><td>{n}</td><td><a href="#{sid}">{esc(title)}</a></td><td>{esc(what)}</td></tr>'
+                  for n, sid, title, what in TOC)
     body = "\n".join([
-        rc.COVER,
-        f'<h2 style="break-before: page">Contents</h2><nav class="toc"><ol>{toc}</ol><p>Appendix A — Running the project</p></nav>',
-        rc.PROBLEM, rc.OBJECTIVES, rc.SCOPE, rc.REQUIREMENTS, rc.PHASE1_REVIEW,
-        ER_SECTION.format(svg=er_svg), SCHEMA_SECTION, rc.JUSTIFICATION, data_dictionary(),
-        SQL_SECTION_TOP, index_table(), SQL_SECTION_REST, rc.VECTOR, ADVANCED, important_queries(),
-        API.format(svg=arch_svg), screenshots(), testing(), COVERAGE, CONTRIB, rc.CONCLUSION, APPENDIX,
+        rc.COVER.replace('<section class="cover">', '<section class="cover" id="cover">'),
+        f'<h2 style="break-before: page">Contents</h2><table class="grid toc"><tbody>{toc}</tbody></table>',
+        # 3 Abstract
+        rc.ABSTRACT, rc.PROBLEM, rc.OBJECTIVES, rc.SCOPE, rc.REQUIREMENTS,
+        # 4 Tech stack
+        rc.TECH_STACK, rc.JUSTIFICATION,
+        # 5 SQL
+        SQL_INTRO, rc.PHASE1_REVIEW, ER_SECTION.format(svg=er_svg), SCHEMA_SECTION, SQL_DDL, index_table(),
+        SQL_SECTION_REST, code_window("db/06_security.sql", "REVOKE CREATE ON SCHEMA public", r"fn_refresh_course_stats\(\) TO"),
+        sql_queries(), ADVANCED,
+        # 6 NoSQL / vector
+        rc.VECTOR_MODEL, vector_commands(), rc.VECTOR_METHODS,
+        # 7 Next.js
+        nextjs_section(), ARCH.format(svg=arch_svg), API_REST,
+        # 8 screenshots
+        code_and_demo(),
+        # 9 rubrics
+        rubric(), testing(), CONTRIB, rc.CONCLUSION,
+        data_dictionary(), APPENDIX,
     ])
     total_tests = load("vitest.json")["numTotalTests"] + load("playwright.json")["stats"]["expected"]
-    body = body.replace("__TOTAL_TESTS__", str(total_tests))
+    passed_tests = load("vitest.json")["numPassedTests"] + load("playwright.json")["stats"]["expected"]
+    body = body.replace("__TOTAL_TESTS__", str(total_tests)).replace("__TESTS_PASSED__", str(passed_tests))
     # short sections continue on the same page instead of starting a new one
-    for sid in ("s2", "s3", "s8", "s12", "s17", "s18"):
+    for sid in ("sB",):
         body = body.replace(f'<h2 id="{sid}">', f'<h2 id="{sid}" class="nb">')
     page = f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"/><title>ScholarMesh — Phase 2 Report</title><style>{CSS}</style></head>
+<html lang="en"><head><meta charset="utf-8"/><title>ScholarMesh — Project Report</title><style>{CSS}</style></head>
 <body>{body}</body></html>"""
     target = HERE / "report.html"
     target.write_text(page, encoding="utf-8")
